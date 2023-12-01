@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "506178372311",
+    "project_id": "taskitty-c64b1",
+    "storage_bucket": "taskitty-c64b1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:506178372311:android:055723ab2f7fce9bf8e692",
+        "android_client_info": {
+          "package_name": "com.example.taskitty_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDO6NDTB8wQ3jzPFpnOEa08VOdJS4dP3pg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
