@@ -1,0 +1,82 @@
+{
+  "helloWorld": "Hello World!",
+  "@helloWorld": {
+    "description": "The conventional newborn programmer greeting"
+  },
+  "loginTitle": "Login",
+  "@loginTitle": {
+    "description": "The title for the login page"
+  },
+  "loginEmail": "Email",
+  "@loginEmail": {
+    "description": "The label for the email field"
+  },
+  "loginPassword": "Password",
+  "@loginPassword": {
+    "description": "The label for the password field"
+  },
+  "loginSubmit": "Login",
+  "@loginSubmit": {
+    "description": "The label for the submit button"
+  },
+  "loginEmailRequired": "Email is required",
+  "@loginEmailRequired": {
+    "description": "The error message when the email field is empty"
+  },
+  "loginEmailInvalid": "Email is invalid",
+  "@loginEmailInvalid": {
+    "description": "The error message when the email field is invalid"
+  },
+  "loginPasswordRequired": "Password is required",
+  "@loginPasswordRequired": {
+    "description": "The error message when the password field is empty"
+  },
+  "loginNotRegistered": "Don't have an account? Register here",
+  "@loginNotRegistered": {
+    "description": "The link to the registration page"
+  },
+  "registerTitle": "Register",
+  "@registerTitle": {
+    "description": "The title for the registration page"
+  },
+  "registerEmail": "Email",
+  "@registerEmail": {
+    "description": "The label for the email field"
+  },
+  "registerPassword": "Password",
+  "@registerPassword": {
+    "description": "The label for the password field"
+  },
+  "registerPasswordConfirm": "Confirm Password",
+  "@registerPasswordConfirm": {
+    "description": "The label for the password confirmation field"
+  },
+  "registerSubmit": "Register",
+  "@registerSubmit": {
+    "description": "The label for the submit button"
+  },
+  "registerEmailRequired": "Email is required",
+  "@registerEmailRequired": {
+    "description": "The error message when the email field is empty"
+  },
+  "registerEmailInvalid": "Email is invalid",
+  "@registerEmailInvalid": {
+    "description": "The error message when the email field is invalid"
+  },
+  "registerPasswordRequired": "Password is required",
+  "@registerPasswordRequired": {
+    "description": "The error message when the password field is empty"
+  },
+  "registerPasswordTooShort": "Password is too short",
+  "@registerPasswordTooShort": {
+    "description": "The error message when the password field is too short"
+  },
+  "registerPasswordConfirmRequired": "Password confirmation is required",
+  "@registerPasswordConfirmRequired": {
+    "description": "The error message when the password confirmation field is empty"
+  },
+  "registerPasswordConfirmNotMatch": "Password confirmation does not match",
+  "@registerPasswordConfirmNotMatch": {
+    "description": "The error message when the password confirmation field does not match the password field"
+  }
+}
