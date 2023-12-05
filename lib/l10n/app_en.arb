@@ -35,6 +35,10 @@
   "@loginNotRegistered": {
     "description": "The link to the registration page"
   },
+  "loginForgotPassword": "Forgot password?",
+  "@loginForgotPassword": {
+    "description": "The link to the forgot password page"
+  },
   "registerTitle": "Register",
   "@registerTitle": {
     "description": "The title for the registration page"
@@ -78,5 +82,33 @@
   "registerPasswordConfirmNotMatch": "Password confirmation does not match",
   "@registerPasswordConfirmNotMatch": {
     "description": "The error message when the password confirmation field does not match the password field"
+  },
+  "forgotPasswordTitle": "Forgot Password",
+  "@forgotPasswordTitle": {
+    "description": "The title for the forgot password page"
+  },
+  "forgotPasswordEmail": "Email",
+  "@forgotPasswordEmail": {
+    "description": "The label for the email field"
+  },
+  "forgotPasswordEmailHint": "Enter your email",
+  "@forgotPasswordEmailHint": {
+    "description": "The hint for the email field"
+  },
+  "forgotPasswordSubmit": "Reset Password",
+  "@forgotPasswordSubmit": {
+    "description": "The label for the submit button"
+  },
+  "forgotPasswordHint": "Enter your email and we'll send you a link to reset your password",
+  "@forgotPasswordHint": {
+    "description": "The hint for the forgot password page"
+  },
+  "forgotPasswordEmailRequired": "Email is required",
+  "@forgotPasswordEmailRequired": {
+    "description": "The error message when the email field is empty"
+  },
+  "forgotPasswordEmailInvalid": "Email is invalid",
+  "@forgotPasswordEmailInvalid": {
+    "description": "The error message when the email field is invalid"
   }
 }

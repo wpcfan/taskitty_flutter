@@ -7,3 +7,9 @@ class LoginStarted extends LoginEvent {
 
   LoginStarted({required this.email, required this.password});
 }
+
+class ForgotPasswordStarted extends LoginEvent {
+  final String email;
+
+  ForgotPasswordStarted({required this.email});
+}

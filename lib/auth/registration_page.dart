@@ -18,15 +18,7 @@ class RegistrationPage extends StatelessWidget {
       create: (context) => RegisterBloc(),
       child: Builder(builder: (context) {
         return BlocConsumer<RegisterBloc, RegisterState>(
-          listener: (context, state) {
-            if (state is RegisterFailureState) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(content: Text(state.error)),
-                );
-            }
-          },
+          listener: listenStateChange,
           builder: (context, state) {
             return Scaffold(
               appBar: AppBar(
@@ -39,83 +31,13 @@ class RegistrationPage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      TextFormField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          labelText:
-                              AppLocalizations.of(context)!.registerEmail,
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return AppLocalizations.of(context)!
-                                .registerEmailRequired;
-                          }
-                          // use regex to validate email
-                          final regExp = RegExp(emailPattern);
-                          if (!regExp.hasMatch(value)) {
-                            return AppLocalizations.of(context)!
-                                .registerEmailInvalid;
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: passwordController,
-                        decoration: InputDecoration(
-                          labelText:
-                              AppLocalizations.of(context)!.registerPassword,
-                        ),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return AppLocalizations.of(context)!
-                                .registerPasswordRequired;
-                          }
-                          if (value.length < 6) {
-                            return AppLocalizations.of(context)!
-                                .registerPasswordTooShort;
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: confirmPasswordController,
-                        decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!
-                              .registerPasswordConfirm,
-                        ),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return AppLocalizations.of(context)!
-                                .registerPasswordConfirmRequired;
-                          }
-                          if (value != passwordController.text) {
-                            return AppLocalizations.of(context)!
-                                .registerPasswordConfirmNotMatch;
-                          }
-                          return null;
-                        },
-                      ),
+                      buildEmailField(emailController, context),
+                      buildPasswordField(passwordController, context),
+                      buildConfirmPasswordField(confirmPasswordController,
+                          context, passwordController),
                       const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          formKey.currentState!.save();
-                          if (formKey.currentState!.validate()) {
-                            // Get the instance of RegisterBloc
-                            final registerBloc =
-                                BlocProvider.of<RegisterBloc>(context);
-                            // Add RegisterStarted event
-                            registerBloc.add(RegisterStarted(
-                              email: emailController.text,
-                              password: passwordController.text,
-                            ));
-                          }
-                        },
-                        child:
-                            Text(AppLocalizations.of(context)!.registerSubmit),
-                      ),
+                      buildRegisterButton(formKey, context, emailController,
+                          passwordController),
                     ],
                   ),
                 ),
@@ -124,6 +46,105 @@ class RegistrationPage extends StatelessWidget {
           },
         );
       }),
+    );
+  }
+
+  void listenStateChange(context, state) {
+    if (state is RegisterFailureState) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(state.error)),
+        );
+    }
+    if (state is RegisterSuccessState) {
+      Navigator.pushReplacementNamed(context, '/home');
+    }
+  }
+
+  ElevatedButton buildRegisterButton(
+      GlobalKey<FormState> formKey,
+      BuildContext context,
+      TextEditingController emailController,
+      TextEditingController passwordController) {
+    return ElevatedButton(
+      onPressed: () {
+        formKey.currentState!.save();
+        if (formKey.currentState!.validate()) {
+          // Get the instance of RegisterBloc
+          final registerBloc = BlocProvider.of<RegisterBloc>(context);
+          // Add RegisterStarted event
+          registerBloc.add(RegisterStarted(
+            email: emailController.text,
+            password: passwordController.text,
+          ));
+        }
+      },
+      child: Text(AppLocalizations.of(context)!.registerSubmit),
+    );
+  }
+
+  TextFormField buildConfirmPasswordField(
+      TextEditingController confirmPasswordController,
+      BuildContext context,
+      TextEditingController passwordController) {
+    return TextFormField(
+      controller: confirmPasswordController,
+      decoration: InputDecoration(
+        labelText: AppLocalizations.of(context)!.registerPasswordConfirm,
+      ),
+      obscureText: true,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return AppLocalizations.of(context)!.registerPasswordConfirmRequired;
+        }
+        if (value != passwordController.text) {
+          return AppLocalizations.of(context)!.registerPasswordConfirmNotMatch;
+        }
+        return null;
+      },
+    );
+  }
+
+  TextFormField buildPasswordField(
+      TextEditingController passwordController, BuildContext context) {
+    return TextFormField(
+      controller: passwordController,
+      decoration: InputDecoration(
+        labelText: AppLocalizations.of(context)!.registerPassword,
+      ),
+      obscureText: true,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return AppLocalizations.of(context)!.registerPasswordRequired;
+        }
+        if (value.length < 6) {
+          return AppLocalizations.of(context)!.registerPasswordTooShort;
+        }
+        return null;
+      },
+    );
+  }
+
+  TextFormField buildEmailField(
+      TextEditingController emailController, BuildContext context) {
+    return TextFormField(
+      controller: emailController,
+      decoration: InputDecoration(
+        labelText: AppLocalizations.of(context)!.registerEmail,
+      ),
+      keyboardType: TextInputType.emailAddress,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return AppLocalizations.of(context)!.registerEmailRequired;
+        }
+        // use regex to validate email
+        final regExp = RegExp(emailPattern);
+        if (!regExp.hasMatch(value)) {
+          return AppLocalizations.of(context)!.registerEmailInvalid;
+        }
+        return null;
+      },
     );
   }
 }

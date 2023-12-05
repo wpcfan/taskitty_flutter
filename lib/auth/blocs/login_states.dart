@@ -15,3 +15,11 @@ class LoginFailureState extends LoginState {
 
   LoginFailureState({required this.error});
 }
+
+class ForgotPasswordSuccessState extends LoginState {}
+
+class ForgotPasswordFailureState extends LoginState {
+  final String error;
+
+  ForgotPasswordFailureState({required this.error});
+}

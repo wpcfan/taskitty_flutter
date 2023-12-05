@@ -7,6 +7,8 @@ import 'login_states.dart';
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc() : super(LoginInitial()) {
     on<LoginStarted>((event, emit) => _mapLoginEventToState(event, emit));
+    on<ForgotPasswordStarted>(
+        (event, emit) => _mapForgotPasswordEventToState(event, emit));
   }
 
   void _mapLoginEventToState(
@@ -23,6 +25,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(LoginFailureState(error: e.message!));
     } catch (e) {
       emit(LoginFailureState(error: e.toString()));
+    }
+  }
+
+  void _mapForgotPasswordEventToState(
+      ForgotPasswordStarted event, Emitter<LoginState> emit) async {
+    // use Firebase Auth to send password reset email
+    emit(LoginLoading());
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: event.email);
+      emit(ForgotPasswordSuccessState());
+    } on FirebaseAuthException catch (e) {
+      emit(ForgotPasswordFailureState(error: e.message!));
+    } catch (e) {
+      emit(ForgotPasswordFailureState(error: e.toString()));
     }
   }
 }
