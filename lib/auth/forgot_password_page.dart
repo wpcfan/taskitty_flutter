@@ -23,20 +23,22 @@ class ForgotPasswordPage extends StatelessWidget {
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.forgotPasswordTitle),
               ),
-              body: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      buildEmailField(emailController, context),
-                      const SizedBox(height: 20),
-                      buildResetPasswordHint(context),
-                      const SizedBox(height: 20),
-                      buildResetPasswordButton(formKey, context,
-                          emailController, passwordController),
-                    ],
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        buildEmailField(emailController, context),
+                        const SizedBox(height: 20),
+                        buildResetPasswordHint(context),
+                        const SizedBox(height: 20),
+                        buildResetPasswordButton(formKey, context,
+                            emailController, passwordController),
+                      ],
+                    ),
                   ),
                 ),
               ),

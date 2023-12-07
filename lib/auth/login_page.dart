@@ -2,6 +2,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'blocs/blocs.dart';
 import 'constants.dart';
@@ -26,34 +27,47 @@ class LoginPage extends StatelessWidget {
         return BlocConsumer<LoginBloc, LoginState>(
           listener: listenStateChange,
           builder: (context, state) {
+            if (state is LoginLoading) {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
             return Scaffold(
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.loginTitle),
               ),
-              body: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      buildEmailField(emailController, context),
-                      buildPasswordField(passwordController, context),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: buildLoginButton(formKey, context,
-                                emailController, passwordController),
-                          ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: buildForgotPasswordButton(context),
-                          ),
-                        ],
-                      ),
-                      buildNotRegisteredButton(context),
-                    ],
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        buildEmailField(emailController, context),
+                        buildPasswordField(passwordController, context),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: buildLoginButton(formKey, context,
+                                  emailController, passwordController),
+                            ),
+                            const SizedBox(width: 20),
+                            Expanded(
+                              child: buildForgotPasswordButton(context),
+                            ),
+                          ],
+                        ),
+                        buildNotRegisteredButton(context),
+                        const SizedBox(height: 20),
+                        buildLoginWithGoogleButton(context),
+                        const SizedBox(height: 20),
+                        buildLoginWithAppleButton(context),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -154,5 +168,35 @@ class LoginPage extends StatelessWidget {
     if (state is LoginSuccessState) {
       Navigator.pushReplacementNamed(context, '/home');
     }
+  }
+
+  Widget buildLoginWithGoogleButton(BuildContext context) {
+    return IconButton(
+      icon: SvgPicture.asset(
+        'assets/images/google/light/web_light_rd_SI.svg',
+        height: 32,
+      ),
+      onPressed: () {
+        // Get the instance of LoginBloc
+        final loginBloc = BlocProvider.of<LoginBloc>(context);
+        // Add LoginWithGoogleStarted event
+        loginBloc.add(LoginWithGoogleStarted());
+      },
+    );
+  }
+
+  Widget buildLoginWithAppleButton(BuildContext context) {
+    return IconButton(
+      icon: Image.asset(
+        'assets/images/apple/light/web_light_cd_SI.png',
+        height: 32,
+      ),
+      onPressed: () {
+        // Get the instance of LoginBloc
+        final loginBloc = BlocProvider.of<LoginBloc>(context);
+        // Add LoginWithAppleStarted event
+        loginBloc.add(LoginWithAppleStarted());
+      },
+    );
   }
 }

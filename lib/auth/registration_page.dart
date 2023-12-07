@@ -24,21 +24,23 @@ class RegistrationPage extends StatelessWidget {
               appBar: AppBar(
                 title: Text(AppLocalizations.of(context)!.registerTitle),
               ),
-              body: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      buildEmailField(emailController, context),
-                      buildPasswordField(passwordController, context),
-                      buildConfirmPasswordField(confirmPasswordController,
-                          context, passwordController),
-                      const SizedBox(height: 20),
-                      buildRegisterButton(formKey, context, emailController,
-                          passwordController),
-                    ],
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        buildEmailField(emailController, context),
+                        buildPasswordField(passwordController, context),
+                        buildConfirmPasswordField(confirmPasswordController,
+                            context, passwordController),
+                        const SizedBox(height: 20),
+                        buildRegisterButton(formKey, context, emailController,
+                            passwordController),
+                      ],
+                    ),
                   ),
                 ),
               ),

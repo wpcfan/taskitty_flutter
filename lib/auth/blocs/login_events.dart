@@ -8,6 +8,14 @@ class LoginStarted extends LoginEvent {
   LoginStarted({required this.email, required this.password});
 }
 
+class LoginWithGoogleStarted extends LoginEvent {}
+
+class LoginWithFacebookStarted extends LoginEvent {}
+
+class LoginWithMicrosoftStarted extends LoginEvent {}
+
+class LoginWithAppleStarted extends LoginEvent {}
+
 class ForgotPasswordStarted extends LoginEvent {
   final String email;
 

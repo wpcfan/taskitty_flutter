@@ -39,6 +39,10 @@
   "@loginForgotPassword": {
     "description": "The link to the forgot password page"
   },
+  "loginWithGoogle": "Sign in with Google",
+  "@loginWithGoogle": {
+    "description": "The label for the Google login button"
+  },
   "registerTitle": "Register",
   "@registerTitle": {
     "description": "The title for the registration page"

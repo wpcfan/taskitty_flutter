@@ -7,12 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:506178372311:android:055723ab2f7fce9bf8e692",
+        "mobilesdk_app_id": "1:506178372311:android:7a74ba183d9082b7f8e692",
         "android_client_info": {
-          "package_name": "com.example.taskitty_flutter"
+          "package_name": "com.twigcodes.taskitty_flutter"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "506178372311-p4bji9dpej5g3t279ob47jn4oe2oujna.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDO6NDTB8wQ3jzPFpnOEa08VOdJS4dP3pg"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "506178372311-p4bji9dpej5g3t279ob47jn4oe2oujna.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "506178372311-3klcr2gp3aggd1d5cp4hurml3h32gcb9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.twigcodes.taskittyFlutter"
+              }
+            }
+          ]
         }
       }
     }

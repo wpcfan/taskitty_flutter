@@ -9,6 +9,7 @@
   "loginPasswordRequired": "请输入密码",
   "loginNotRegistered": "还没有账号？点此注册",
   "loginForgotPassword": "忘记密码？",
+  "loginWithGoogle": "使用Google账号登录",
   "registerTitle": "注册",
   "registerEmail": "邮箱",
   "registerPassword": "密码",

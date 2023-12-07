@@ -1,4 +1,4 @@
-package com.example.taskitty_flutter
+package com.twigcodes.taskitty_flutter
 
 import io.flutter.embedding.android.FlutterActivity
 

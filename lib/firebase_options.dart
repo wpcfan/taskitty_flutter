@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDO6NDTB8wQ3jzPFpnOEa08VOdJS4dP3pg',
-    appId: '1:506178372311:android:055723ab2f7fce9bf8e692',
+    appId: '1:506178372311:android:7a74ba183d9082b7f8e692',
     messagingSenderId: '506178372311',
     projectId: 'taskitty-c64b1',
     storageBucket: 'taskitty-c64b1.appspot.com',
@@ -59,10 +59,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCl5Codg5bY6QheXv7XR6cB8ABcnP8O_vo',
-    appId: '1:506178372311:ios:a0e773e66e93750df8e692',
+    appId: '1:506178372311:ios:5ff724da6b064ab8f8e692',
     messagingSenderId: '506178372311',
     projectId: 'taskitty-c64b1',
     storageBucket: 'taskitty-c64b1.appspot.com',
-    iosBundleId: 'com.example.taskittyFlutter',
+    androidClientId: '506178372311-irrq1c1lfg2mstj0r4id2ftmdk4aa7n4.apps.googleusercontent.com',
+    iosClientId: '506178372311-3klcr2gp3aggd1d5cp4hurml3h32gcb9.apps.googleusercontent.com',
+    iosBundleId: 'com.twigcodes.taskittyFlutter',
   );
 }
