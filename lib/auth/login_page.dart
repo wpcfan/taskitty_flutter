@@ -1,4 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -10,10 +11,12 @@ import 'constants.dart';
 class LoginPage extends StatelessWidget {
   final FirebaseAnalytics analytics;
   final FirebaseAnalyticsObserver observer;
+  final FirebaseAuth auth;
   const LoginPage({
     super.key,
     required this.analytics,
     required this.observer,
+    required this.auth,
   });
 
   @override
@@ -22,7 +25,7 @@ class LoginPage extends StatelessWidget {
     final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
     return BlocProvider(
-      create: (context) => LoginBloc(),
+      create: (context) => LoginBloc(auth: auth),
       child: Builder(builder: (context) {
         return BlocConsumer<LoginBloc, LoginState>(
           listener: listenStateChange,

@@ -7,7 +7,9 @@ import 'login_events.dart';
 import 'login_states.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  LoginBloc() : super(LoginInitial()) {
+  final FirebaseAuth auth;
+
+  LoginBloc({required this.auth}) : super(LoginInitial()) {
     on<LoginStarted>((event, emit) => _mapLoginEventToState(event, emit));
     on<LoginWithGoogleStarted>(
         (event, emit) => _mapLoginWithGoogleEventToState(event, emit));
@@ -22,7 +24,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     // use Firebase Auth to login
     emit(LoginLoading());
     try {
-      final result = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final result = await auth.signInWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
@@ -51,8 +53,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
-      final result =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+      final result = await auth.signInWithCredential(credential);
       emit(LoginSuccessState(uid: result.user!.uid));
     } on FirebaseAuthException catch (e) {
       emit(LoginFailureState(error: e.message!));
@@ -68,12 +69,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     try {
       final appleProvider = AppleAuthProvider();
       if (kIsWeb) {
-        final result =
-            await FirebaseAuth.instance.signInWithPopup(appleProvider);
+        final result = await auth.signInWithPopup(appleProvider);
         emit(LoginSuccessState(uid: result.user!.uid));
       } else {
-        final result =
-            await FirebaseAuth.instance.signInWithProvider(appleProvider);
+        final result = await auth.signInWithProvider(appleProvider);
         emit(LoginSuccessState(uid: result.user!.uid));
       }
     } on FirebaseAuthException catch (e) {

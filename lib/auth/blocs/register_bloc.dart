@@ -5,7 +5,9 @@ import 'register_events.dart';
 import 'register_states.dart';
 
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
-  RegisterBloc() : super(RegisterInitial()) {
+  final FirebaseAuth auth;
+
+  RegisterBloc({required this.auth}) : super(RegisterInitial()) {
     on<RegisterStarted>((event, emit) => _mapRegisterEventToState(event, emit));
   }
 
@@ -14,7 +16,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     // use Firebase Auth to register
     emit(RegisterLoading());
     try {
-      final result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final result = await auth.createUserWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );

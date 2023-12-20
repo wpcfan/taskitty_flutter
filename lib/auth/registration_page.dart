@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -6,7 +7,11 @@ import 'blocs/blocs.dart';
 import 'constants.dart';
 
 class RegistrationPage extends StatelessWidget {
-  const RegistrationPage({super.key});
+  final FirebaseAuth auth;
+  const RegistrationPage({
+    super.key,
+    required this.auth,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +20,7 @@ class RegistrationPage extends StatelessWidget {
     final confirmPasswordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
     return BlocProvider(
-      create: (context) => RegisterBloc(),
+      create: (context) => RegisterBloc(auth: auth),
       child: Builder(builder: (context) {
         return BlocConsumer<RegisterBloc, RegisterState>(
           listener: listenStateChange,

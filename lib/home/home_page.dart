@@ -336,9 +336,9 @@ class HomePageState extends State<HomePage> {
               ),
             ),
             ListTile(
-              title: const Text('Crashlytics'),
+              title: const Text('Todos'),
               onTap: () {
-                Navigator.of(context).pushNamed('/crashlytics');
+                Navigator.of(context).pushNamed('/todos');
               },
             ),
             ListTile(

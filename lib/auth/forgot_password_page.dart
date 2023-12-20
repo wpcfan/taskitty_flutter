@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -6,7 +7,11 @@ import 'blocs/blocs.dart';
 import 'constants.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
-  const ForgotPasswordPage({super.key});
+  final FirebaseAuth auth;
+  const ForgotPasswordPage({
+    super.key,
+    required this.auth,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +19,7 @@ class ForgotPasswordPage extends StatelessWidget {
     final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
     return BlocProvider(
-      create: (context) => LoginBloc(),
+      create: (context) => LoginBloc(auth: auth),
       child: Builder(builder: (context) {
         return BlocConsumer<LoginBloc, LoginState>(
           listener: listenStateChange,
