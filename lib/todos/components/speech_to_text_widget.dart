@@ -5,14 +5,14 @@ import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
+import '../../constants.dart';
+
 class SpeechToTextWidget extends StatefulWidget {
   final Function(String)? onVoiceRecognized;
-  final bool logEvents;
   final FirebaseAnalytics analytics;
   const SpeechToTextWidget({
     super.key,
     this.onVoiceRecognized,
-    this.logEvents = false,
     required this.analytics,
   });
 
@@ -41,7 +41,7 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
       _loading = true;
     });
     _speechEnabled = await _speechToText.initialize(
-      debugLogging: widget.logEvents,
+      debugLogging: isDevelopment,
       onError: errorListener,
       onStatus: statusListener,
     );
@@ -66,18 +66,18 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
     });
   }
 
-  void _logEvent(String eventDescription) {
-    if (widget.logEvents) {
-      var eventTime = DateTime.now().toIso8601String();
+  void _logEvent(String eventDescription) async {
+    var eventTime = DateTime.now().toIso8601String();
+    if (isDevelopment) {
       debugPrint('$eventTime $eventDescription');
-      widget.analytics.logEvent(
-        name: 'speech_to_text',
-        parameters: <String, dynamic>{
-          'event_time': eventTime,
-          'event_description': eventDescription,
-        },
-      );
     }
+    await widget.analytics.logEvent(
+      name: 'speech_to_text',
+      parameters: <String, dynamic>{
+        'event_time': eventTime,
+        'event_description': eventDescription,
+      },
+    );
   }
 
   /// Each time to start a speech recognition session
@@ -130,6 +130,20 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
           ),
         ),
         Center(child: _loading ? const CircularProgressIndicator() : mic),
+        if (isDevelopment && _lastError.isNotEmpty)
+          Center(
+            child: Text(
+              _lastError,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        if (isDevelopment && _lastStatus.isNotEmpty)
+          Center(
+            child: Text(
+              _lastStatus,
+              style: const TextStyle(color: Colors.green),
+            ),
+          ),
       ],
     );
   }
