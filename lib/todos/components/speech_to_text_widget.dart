@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
@@ -7,10 +8,12 @@ import 'package:speech_to_text/speech_to_text.dart';
 class SpeechToTextWidget extends StatefulWidget {
   final Function(String)? onVoiceRecognized;
   final bool logEvents;
+  final FirebaseAnalytics analytics;
   const SpeechToTextWidget({
     super.key,
     this.onVoiceRecognized,
     this.logEvents = false,
+    required this.analytics,
   });
 
   @override
@@ -67,6 +70,13 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
     if (widget.logEvents) {
       var eventTime = DateTime.now().toIso8601String();
       debugPrint('$eventTime $eventDescription');
+      widget.analytics.logEvent(
+        name: 'speech_to_text',
+        parameters: <String, dynamic>{
+          'event_time': eventTime,
+          'event_description': eventDescription,
+        },
+      );
     }
   }
 

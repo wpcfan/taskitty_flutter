@@ -80,7 +80,9 @@ class MyApp extends StatelessWidget {
               firestore: firestore,
               auth: auth,
             ),
-        '/add_todo': (context) => const AddTodoPage(),
+        '/add_todo': (context) => AddTodoPage(
+              analytics: analytics,
+            ),
       },
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),

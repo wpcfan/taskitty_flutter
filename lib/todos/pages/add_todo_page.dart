@@ -1,13 +1,16 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../components/components.dart';
 
 class AddTodoPage extends StatelessWidget {
+  final FirebaseAnalytics analytics;
   final Function(String)? onAdd;
   const AddTodoPage({
     super.key,
     this.onAdd,
+    required this.analytics,
   });
 
   @override
@@ -53,10 +56,13 @@ class AddTodoPage extends StatelessWidget {
               child: Expanded(child: input),
             ),
             Expanded(
-              child: SpeechToTextWidget(onVoiceRecognized: (text) {
-                textEditingController.text = text;
-                debugPrint('Voice recognized: $text');
-              }),
+              child: SpeechToTextWidget(
+                analytics: analytics,
+                onVoiceRecognized: (text) {
+                  textEditingController.text = text;
+                  debugPrint('Voice recognized: $text');
+                },
+              ),
             ),
             sendButton,
           ],
