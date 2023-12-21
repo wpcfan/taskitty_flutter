@@ -1,5 +1,5 @@
 {
-  "helloWorld": "你好，世界！",
+  "appTitle": "任务猫",
   "loginTitle": "登录",
   "loginEmail": "邮箱",
   "loginPassword": "密码",
@@ -27,5 +27,10 @@
   "forgotPasswordSubmit": "发送重置邮件",
   "forgotPasswordHint": "输入您的邮箱，我们将发送一封重置密码的邮件给您",
   "forgotPasswordEmailRequired": "请输入邮箱",
-  "forgotPasswordEmailInvalid": "邮箱格式不正确"
+  "forgotPasswordEmailInvalid": "邮箱格式不正确",
+  "tapToStart": "点击麦克风开始录音...",
+  "speechNotAvailable": "语音识别不可用",
+  "addTodoHintText": "输入待办事项",
+  "addTodoButtonText": "添加",
+  "addTodoPageTitle": "添加待办事项"
 }

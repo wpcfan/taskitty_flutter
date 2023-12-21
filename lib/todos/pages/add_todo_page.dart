@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../components/components.dart';
 
@@ -17,7 +18,7 @@ class AddTodoPage extends StatelessWidget {
     final input = TextField(
       controller: textEditingController,
       decoration: InputDecoration(
-        hintText: 'What needs to be done?',
+        hintText: AppLocalizations.of(context)!.addTodoHintText,
         suffixIcon: IconButton(
           icon: const Icon(Icons.clear),
           onPressed: () {
@@ -35,12 +36,12 @@ class AddTodoPage extends StatelessWidget {
         }
         Navigator.pop(context);
       },
-      child: const Text('Confirm'),
+      child: Text(AppLocalizations.of(context)!.addTodoButtonText),
     );
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Todo'),
+        title: Text(AppLocalizations.of(context)!.addTodoPageTitle),
       ),
       body: SafeArea(
         child: Column(

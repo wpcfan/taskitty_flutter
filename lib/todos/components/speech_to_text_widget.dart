@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class SpeechToTextWidget extends StatefulWidget {
   final Function(String)? onVoiceRecognized;
+  final bool logEvents;
   const SpeechToTextWidget({
     super.key,
     this.onVoiceRecognized,
+    this.logEvents = false,
   });
 
   @override
@@ -18,9 +21,10 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
   final SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
-  final bool _logEvents = true;
-  String lastError = '';
-  String lastStatus = '';
+
+  String _lastError = '';
+  String _lastStatus = '';
+  bool _loading = false;
 
   @override
   void initState() {
@@ -30,18 +34,24 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
 
   /// This has to happen only once per app
   void _initSpeech() async {
+    setState(() {
+      _loading = true;
+    });
     _speechEnabled = await _speechToText.initialize(
-      debugLogging: _logEvents,
+      debugLogging: widget.logEvents,
       onError: errorListener,
       onStatus: statusListener,
     );
+    setState(() {
+      _loading = false;
+    });
   }
 
   void errorListener(SpeechRecognitionError error) {
     _logEvent(
         'Received error status: $error, listening: ${_speechToText.isListening}');
     setState(() {
-      lastError = '${error.errorMsg} - ${error.permanent}';
+      _lastError = '${error.errorMsg} - ${error.permanent}';
     });
   }
 
@@ -49,12 +59,12 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
     _logEvent(
         'Received listener status: $status, listening: ${_speechToText.isListening}');
     setState(() {
-      lastStatus = status;
+      _lastStatus = status;
     });
   }
 
   void _logEvent(String eventDescription) {
-    if (_logEvents) {
+    if (widget.logEvents) {
       var eventTime = DateTime.now().toIso8601String();
       debugPrint('$eventTime $eventDescription');
     }
@@ -85,7 +95,10 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
   @override
   Widget build(BuildContext context) {
     final mic = IconButton(
-      icon: Icon(_speechToText.isNotListening ? Icons.mic_off : Icons.mic),
+      icon: Icon(
+        _speechToText.isNotListening ? Icons.mic_off : Icons.mic,
+        color: _speechToText.isNotListening ? Colors.grey : Colors.green[400],
+      ),
       onPressed:
           _speechToText.isNotListening ? _startListening : _stopListening,
     );
@@ -102,11 +115,11 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
                 // recognition is not yet ready or not supported on
                 // the target device
                 : _speechEnabled
-                    ? 'Tap the microphone to start listening...'
-                    : 'Speech not available',
+                    ? AppLocalizations.of(context)!.tapToStart
+                    : AppLocalizations.of(context)!.speechNotAvailable,
           ),
         ),
-        Center(child: mic),
+        Center(child: _loading ? const CircularProgressIndicator() : mic),
       ],
     );
   }

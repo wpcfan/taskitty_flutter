@@ -1,7 +1,7 @@
 {
-  "helloWorld": "Hello World!",
-  "@helloWorld": {
-    "description": "The conventional newborn programmer greeting"
+  "appTitle": "Taskitty",
+  "@appTitle": {
+    "description": "The title for the app"
   },
   "loginTitle": "Login",
   "@loginTitle": {
@@ -114,5 +114,25 @@
   "forgotPasswordEmailInvalid": "Email is invalid",
   "@forgotPasswordEmailInvalid": {
     "description": "The error message when the email field is invalid"
+  },
+  "tapToStart": "Tap the microphone to start listening...",
+  "@tapToStart": {
+    "description": "The hint for the microphone button"
+  },
+  "speechNotAvailable": "Speech recognition is not available",
+  "@speechNotAvailable": {
+    "description": "The error message when speech recognition is not available"
+  },
+  "addTodoHintText": "What needs to be done?",
+  "@addTodoHintText": {
+    "description": "The hint for the add todo input"
+  },
+  "addTodoButtonText": "Confirm",
+  "@addTodoButtonText": {
+    "description": "The label for the add todo button"
+  },
+  "addTodoPageTitle": "Add Todo",
+  "@addTodoPageTitle": {
+    "description": "The title for the add todo page"
   }
 }
