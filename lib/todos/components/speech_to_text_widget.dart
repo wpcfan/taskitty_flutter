@@ -24,7 +24,6 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
   final SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
-
   String _lastError = '';
   String _lastStatus = '';
   bool _loading = false;
@@ -37,17 +36,11 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
 
   /// This has to happen only once per app
   void _initSpeech() async {
-    setState(() {
-      _loading = true;
-    });
     _speechEnabled = await _speechToText.initialize(
       debugLogging: isDevelopment,
       onError: errorListener,
       onStatus: statusListener,
     );
-    setState(() {
-      _loading = false;
-    });
   }
 
   void errorListener(SpeechRecognitionError error) {
@@ -82,7 +75,13 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
 
   /// Each time to start a speech recognition session
   void _startListening() async {
+    setState(() {
+      _loading = true;
+    });
     await _speechToText.listen(onResult: _onSpeechResult);
+    setState(() {
+      _loading = false;
+    });
   }
 
   /// Manually stop the active speech recognition session
@@ -105,31 +104,37 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
   @override
   Widget build(BuildContext context) {
     final mic = IconButton(
-      icon: Icon(
-        _speechToText.isNotListening ? Icons.mic_off : Icons.mic,
-        color: _speechToText.isNotListening ? Colors.grey : Colors.green[400],
-      ),
-      onPressed:
-          _speechToText.isNotListening ? _startListening : _stopListening,
+      icon: _loading
+          ? const CircularProgressIndicator(
+              backgroundColor: Colors.grey,
+              color: Colors.white,
+              strokeWidth: 2,
+            )
+          : Icon(
+              _speechToText.isNotListening ? Icons.mic_off : Icons.mic,
+              color: _speechToText.isNotListening
+                  ? Colors.grey
+                  : Colors.green[400],
+            ),
+      onPressed: !_loading && _speechToText.isNotListening
+          ? _startListening
+          : _stopListening,
     );
     return Column(
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            // If listening is active show the recognized words
-            _speechToText.isListening
-                ? _lastWords
-                // If listening isn't active but could be tell the user
-                // how to start it, otherwise indicate that speech
-                // recognition is not yet ready or not supported on
-                // the target device
-                : _speechEnabled
-                    ? AppLocalizations.of(context)!.tapToStart
-                    : AppLocalizations.of(context)!.speechNotAvailable,
-          ),
+        Text(
+          // If listening is active show the recognized words
+          _speechToText.isListening
+              ? _lastWords
+              // If listening isn't active but could be tell the user
+              // how to start it, otherwise indicate that speech
+              // recognition is not yet ready or not supported on
+              // the target device
+              : _speechEnabled
+                  ? AppLocalizations.of(context)!.tapToStart
+                  : AppLocalizations.of(context)!.speechNotAvailable,
         ),
-        Center(child: _loading ? const CircularProgressIndicator() : mic),
+        Center(child: mic),
         if (isDevelopment && _lastError.isNotEmpty)
           Center(
             child: Text(

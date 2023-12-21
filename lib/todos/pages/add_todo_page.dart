@@ -53,7 +53,7 @@ class AddTodoPage extends StatelessWidget {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Expanded(child: input),
+              child: input,
             ),
             Expanded(
               child: SpeechToTextWidget(
