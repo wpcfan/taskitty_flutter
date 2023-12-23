@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:relative_time/relative_time.dart';
 
 import '../models/models.dart';
 
@@ -48,11 +49,27 @@ class TodoItemWidget extends StatelessWidget {
       ),
     );
 
+    final updated = Text(
+      todo.updatedAt.relativeTime(context),
+      style: const TextStyle(
+        fontSize: 12,
+        color: Colors.grey,
+      ),
+    );
+
+    final bottomRow = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        description,
+        updated,
+      ],
+    );
+
     final column = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         title,
-        description,
+        bottomRow,
       ],
     );
     final row = Row(
@@ -90,7 +107,31 @@ class TodoItemWidget extends StatelessWidget {
     final deleteAction = SlidableAction(
       onPressed: (context) {
         if (onDelete != null) {
-          onDelete!(todo);
+          // pop up a dialog to confirm delete
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Delete Todo'),
+                content: const Text('Are you sure you want to delete this?'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      onDelete!(todo);
+                    },
+                    child: const Text('Delete'),
+                  ),
+                ],
+              );
+            },
+          );
         }
       },
       label: deleteText,

@@ -4,7 +4,7 @@ class Todo {
   final String? description;
   final bool completed;
   final DateTime createdAt;
-  final DateTime? updatedAt;
+  final DateTime updatedAt;
 
   Todo({
     this.id,
@@ -13,8 +13,8 @@ class Todo {
     this.completed = false,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : createdAt = DateTime.now(),
-        updatedAt = DateTime.now();
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 
   Todo copyWith({
     String? id,
