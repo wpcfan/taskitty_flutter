@@ -13,16 +13,27 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   TodoBloc({
     required this.firestore,
     required this.auth,
-  }) : super(const TodoInitial()) {
+  }) : super(const TodoState()) {
     on<LoadTodos>((event, emit) => _mapLoadTodosToState(event, emit));
     on<AddTodo>((event, emit) => _mapAddTodoToState(event, emit));
     on<UpdateTodo>((event, emit) => _mapUpdateTodoToState(event, emit));
     on<DeleteTodo>((event, emit) => _mapDeleteTodoToState(event, emit));
+    on<ToggleTodo>((event, emit) => _mapToggleTodoToState(event, emit));
+    on<ClearError>((event, emit) => _mapClearErrorToState(event, emit));
+  }
+
+  void _mapToggleTodoToState(ToggleTodo event, Emitter<TodoState> emit) async {
+    final updatedTodo = event.todo.copyWith(completed: !event.todo.completed);
+    await _mapUpdateTodoToState(
+        UpdateTodo(
+          updatedTodo,
+        ),
+        emit);
   }
 
   Future<void> _mapLoadTodosToState(
       LoadTodos event, Emitter<TodoState> emit) async {
-    emit(const TodoLoading());
+    emit(state.copyWith(loading: true));
     try {
       final todos = await firestore
           .collection(collectionName)
@@ -33,17 +44,17 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
             .collection(collectionName)
             .doc(auth.currentUser!.uid)
             .set(<String, dynamic>{});
-        emit(const TodoLoaded([]));
+        emit(state.copyWith(loading: false));
       } else {
         final List<Todo> mappedTodos = todos
             .data()!
             .entries
             .map((e) => Todo.fromMap(e.value, e.key))
             .toList();
-        emit(TodoLoaded(mappedTodos));
+        emit(state.copyWith(todos: mappedTodos, loading: false));
       }
     } catch (e) {
-      emit(TodoError(e.toString()));
+      emit(state.copyWith(error: e.toString(), loading: false));
     }
   }
 
@@ -57,8 +68,9 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
       await todos.reference
           .update(<String, dynamic>{event.todo.id!: event.todo.toMap()});
+      emit(state.copyWith(todos: [event.todo, ...state.todos], loading: false));
     } catch (e) {
-      emit(TodoError(e.toString()));
+      emit(state.copyWith(error: e.toString(), loading: false));
     }
   }
 
@@ -67,21 +79,35 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     try {
       await firestore
           .collection(collectionName)
-          .doc(event.updatedTodo.id)
-          .update(event.updatedTodo.toMap());
-      emit(TodoUpdated(event.updatedTodo));
+          .doc(auth.currentUser!.uid)
+          .update(<String, dynamic>{
+        event.updatedTodo.id!: event.updatedTodo.toMap()
+      });
+      final updatedTodos = state.todos.map((todo) {
+        return todo.id == event.updatedTodo.id ? event.updatedTodo : todo;
+      }).toList();
+      emit(state.copyWith(todos: updatedTodos, loading: false));
     } catch (e) {
-      emit(TodoError(e.toString()));
+      emit(state.copyWith(error: e.toString(), loading: false));
     }
   }
 
   Future<void> _mapDeleteTodoToState(
       DeleteTodo event, Emitter<TodoState> emit) async {
     try {
-      await firestore.collection(collectionName).doc(event.id).delete();
-      emit(TodoDeleted(event.id));
+      await firestore
+          .collection(collectionName)
+          .doc(auth.currentUser!.uid)
+          .update(<String, dynamic>{event.id: FieldValue.delete()});
+      final updatedTodos =
+          state.todos.where((todo) => todo.id != event.id).toList();
+      emit(state.copyWith(todos: updatedTodos, loading: false));
     } catch (e) {
-      emit(TodoError(e.toString()));
+      emit(state.copyWith(error: e.toString(), loading: false));
     }
+  }
+
+  void _mapClearErrorToState(ClearError event, Emitter<TodoState> emit) {
+    emit(state.copyWith(error: ''));
   }
 }

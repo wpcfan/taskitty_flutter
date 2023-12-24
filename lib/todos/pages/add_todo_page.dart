@@ -31,15 +31,15 @@ class AddTodoPage extends StatelessWidget {
         auth: auth,
         firestore: firestore,
       ),
-      child: BlocConsumer<TodoBloc, TodoState>(
-        listener: listenStateChange,
-        builder: (context, state) {
-          return Scaffold(
+      child: Builder(builder: (context) {
+        return BlocListener<TodoBloc, TodoState>(
+          listener: listenStateChange,
+          child: Scaffold(
             appBar: buildAppBar(context),
             body: buildScaffoldBody(textEditingController, context),
-          );
-        },
-      ),
+          ),
+        );
+      }),
     );
   }
 
@@ -80,14 +80,22 @@ class AddTodoPage extends StatelessWidget {
       TextEditingController textEditingController, BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        if (textEditingController.text.isNotEmpty) {
-          context.read<TodoBloc>().add(AddTodo(Todo(
-                id: const Uuid().v4(),
-                title: textEditingController.text,
-              )));
+        if (textEditingController.text.trim().isNotEmpty) {
+          final todo = Todo(
+            id: const Uuid().v4(),
+            title: textEditingController.text,
+          );
+
           textEditingController.clear();
+          Navigator.pop(context, todo);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text(AppLocalizations.of(context)!.addTodoErrorTextIsEmpty),
+            ),
+          );
         }
-        Navigator.pop(context);
       },
       child: Text(AppLocalizations.of(context)!.addTodoButtonText),
     );
@@ -113,12 +121,14 @@ class AddTodoPage extends StatelessWidget {
   }
 
   void listenStateChange(context, state) {
-    if (state is TodoError) {
+    if (state.error.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(state.message),
         ),
       );
+
+      context.read<TodoBloc>().add(const ClearError());
     }
   }
 }

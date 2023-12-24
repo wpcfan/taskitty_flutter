@@ -26,15 +26,15 @@ class AddTodo extends TodoEvent {
 }
 
 class ToggleTodo extends TodoEvent {
-  final String id;
+  final Todo todo;
 
-  const ToggleTodo(this.id);
-
-  @override
-  List<Object> get props => [id];
+  const ToggleTodo(this.todo);
 
   @override
-  String toString() => 'ToggleTodo { id: $id }';
+  List<Object> get props => [todo];
+
+  @override
+  String toString() => 'ToggleTodo { toggleTodo: $todo }';
 }
 
 class UpdateTodo extends TodoEvent {
@@ -59,4 +59,11 @@ class DeleteTodo extends TodoEvent {
 
   @override
   String toString() => 'DeleteTodo { id: $id }';
+}
+
+class ClearError extends TodoEvent {
+  const ClearError();
+
+  @override
+  List<Object> get props => [];
 }

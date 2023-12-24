@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../blocs/blocs.dart';
 import '../components/components.dart';
+import '../models/models.dart';
 
 class TodoListPage extends StatelessWidget {
   final FirebaseFirestore firestore;
@@ -22,37 +23,47 @@ class TodoListPage extends StatelessWidget {
         firestore: firestore,
         auth: auth,
       )..add(const LoadTodos()),
-      child: BlocConsumer<TodoBloc, TodoState>(
-        listener: (context, state) {
-          // TODO: implement listener
-        },
-        builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Todos'),
-            ),
-            body: _buildBody(context, state),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/add_todo');
-              },
-              child: const Icon(Icons.add),
-            ),
-          );
-        },
-      ),
+      child: Builder(builder: (context) {
+        return BlocConsumer<TodoBloc, TodoState>(
+          listener: (context, state) {
+            // TODO: implement listener
+          },
+          builder: (context, state) {
+            final bloc = context.read<TodoBloc>();
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text('Todos'),
+              ),
+              body: _buildBody(context, state),
+              floatingActionButton: FloatingActionButton(
+                onPressed: () async {
+                  final Todo todo =
+                      await Navigator.pushNamed(context, '/add_todo') as Todo;
+                  bloc.add(AddTodo(todo));
+                },
+                child: const Icon(Icons.add),
+              ),
+            );
+          },
+        );
+      }),
     );
   }
 
   Widget _buildBody(BuildContext context, TodoState state) {
-    if (state is TodoLoading) {
+    if (state.loading) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
-    if (state is TodoLoaded) {
-      return TodoListWidget(todos: state.todos);
-    }
-    return Container();
+    return TodoListWidget(
+      todos: state.todos,
+      onToggle: (todo) {
+        context.read<TodoBloc>().add(ToggleTodo(todo));
+      },
+      onDelete: (todo) {
+        context.read<TodoBloc>().add(DeleteTodo(todo.id ?? ''));
+      },
+    );
   }
 }

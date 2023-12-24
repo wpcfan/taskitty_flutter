@@ -134,5 +134,9 @@
   "addTodoPageTitle": "Add Todo",
   "@addTodoPageTitle": {
     "description": "The title for the add todo page"
+  },
+  "addTodoErrorTextIsEmpty": "Text is empty",
+  "@addTodoErrorTextIsEmpty": {
+    "description": "The error message when the text field is empty"
   }
 }

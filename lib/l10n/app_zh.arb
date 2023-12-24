@@ -32,5 +32,6 @@
   "speechNotAvailable": "语音识别不可用",
   "addTodoHintText": "输入待办事项",
   "addTodoButtonText": "添加",
-  "addTodoPageTitle": "添加待办事项"
+  "addTodoPageTitle": "添加待办事项",
+  "addTodoErrorTextIsEmpty": "待办事项不能为空"
 }

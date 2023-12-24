@@ -5,7 +5,16 @@ import 'todo_item_widget.dart';
 
 class TodoListWidget extends StatelessWidget {
   final List<Todo> todos;
-  const TodoListWidget({super.key, this.todos = const []});
+  final Function(Todo)? onToggle;
+  final Function(Todo)? onEdit;
+  final Function(Todo)? onDelete;
+  const TodoListWidget({
+    super.key,
+    this.todos = const [],
+    this.onToggle,
+    this.onEdit,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +25,9 @@ class TodoListWidget extends StatelessWidget {
         return TodoItemWidget(
           key: Key('__todo_item_${todo.id}'),
           todo: todo,
+          onToggle: onToggle,
+          onEdit: onEdit,
+          onDelete: onDelete,
         );
       },
     );
