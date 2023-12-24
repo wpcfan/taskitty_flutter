@@ -84,8 +84,6 @@ class MyApp extends StatelessWidget {
             ),
         '/add_todo': (context) => AddTodoPage(
               analytics: analytics,
-              auth: auth,
-              firestore: firestore,
             ),
       },
       home: StreamBuilder<User?>(

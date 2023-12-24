@@ -1,23 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:taskitty_flutter/todos/todos.dart';
 import 'package:uuid/uuid.dart';
 
-import '../blocs/blocs.dart';
-
 class AddTodoPage extends StatelessWidget {
   final FirebaseAnalytics analytics;
-  final FirebaseAuth auth;
-  final FirebaseFirestore firestore;
   const AddTodoPage({
     super.key,
     required this.analytics,
-    required this.auth,
-    required this.firestore,
   });
 
   @override
@@ -26,20 +17,9 @@ class AddTodoPage extends StatelessWidget {
     // and will display a clear button when text is entered
     final textEditingController = TextEditingController();
 
-    return BlocProvider<TodoBloc>(
-      create: (context) => TodoBloc(
-        auth: auth,
-        firestore: firestore,
-      ),
-      child: Builder(builder: (context) {
-        return BlocListener<TodoBloc, TodoState>(
-          listener: listenStateChange,
-          child: Scaffold(
-            appBar: buildAppBar(context),
-            body: buildScaffoldBody(textEditingController, context),
-          ),
-        );
-      }),
+    return Scaffold(
+      appBar: buildAppBar(context),
+      body: buildScaffoldBody(textEditingController, context),
     );
   }
 
@@ -118,17 +98,5 @@ class AddTodoPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void listenStateChange(context, state) {
-    if (state.error.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(state.message),
-        ),
-      );
-
-      context.read<TodoBloc>().add(const ClearError());
-    }
   }
 }

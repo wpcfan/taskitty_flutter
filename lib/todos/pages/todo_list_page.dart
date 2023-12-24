@@ -26,7 +26,15 @@ class TodoListPage extends StatelessWidget {
       child: Builder(builder: (context) {
         return BlocConsumer<TodoBloc, TodoState>(
           listener: (context, state) {
-            // TODO: implement listener
+            if (state.error.isNotEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.error),
+                ),
+              );
+
+              context.read<TodoBloc>().add(const ClearError());
+            }
           },
           builder: (context, state) {
             final bloc = context.read<TodoBloc>();
