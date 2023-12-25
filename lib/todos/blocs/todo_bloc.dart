@@ -20,6 +20,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     on<DeleteTodo>((event, emit) => _mapDeleteTodoToState(event, emit));
     on<ToggleTodo>((event, emit) => _mapToggleTodoToState(event, emit));
     on<ClearError>((event, emit) => _mapClearErrorToState(event, emit));
+    on<SearchTodos>((event, emit) => _mapSearchTodosToState(event, emit));
   }
 
   void _mapToggleTodoToState(ToggleTodo event, Emitter<TodoState> emit) async {
@@ -51,7 +52,13 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
             .entries
             .map((e) => Todo.fromMap(e.value, e.key))
             .toList();
-        emit(state.copyWith(todos: mappedTodos, loading: false));
+        // order todos by updatedAt
+        mappedTodos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+        emit(state.copyWith(
+          todos: mappedTodos,
+          filteredTodos: mappedTodos,
+          loading: false,
+        ));
       }
     } catch (e) {
       emit(state.copyWith(error: e.toString(), loading: false));
@@ -86,7 +93,16 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       final updatedTodos = state.todos.map((todo) {
         return todo.id == event.updatedTodo.id ? event.updatedTodo : todo;
       }).toList();
-      emit(state.copyWith(todos: updatedTodos, loading: false));
+      updatedTodos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      final updatedFilteredTodos = state.filteredTodos.map((todo) {
+        return todo.id == event.updatedTodo.id ? event.updatedTodo : todo;
+      }).toList();
+      updatedFilteredTodos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      emit(state.copyWith(
+        todos: updatedTodos,
+        filteredTodos: updatedFilteredTodos,
+        loading: false,
+      ));
     } catch (e) {
       emit(state.copyWith(error: e.toString(), loading: false));
     }
@@ -101,7 +117,13 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
           .update(<String, dynamic>{event.id: FieldValue.delete()});
       final updatedTodos =
           state.todos.where((todo) => todo.id != event.id).toList();
-      emit(state.copyWith(todos: updatedTodos, loading: false));
+      final updatedFilteredTodos =
+          state.filteredTodos.where((todo) => todo.id != event.id).toList();
+      emit(state.copyWith(
+        todos: updatedTodos,
+        filteredTodos: updatedFilteredTodos,
+        loading: false,
+      ));
     } catch (e) {
       emit(state.copyWith(error: e.toString(), loading: false));
     }
@@ -109,5 +131,18 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
   void _mapClearErrorToState(ClearError event, Emitter<TodoState> emit) {
     emit(state.copyWith(error: ''));
+  }
+
+  void _mapSearchTodosToState(SearchTodos event, Emitter<TodoState> emit) {
+    if (event.query.isEmpty) {
+      emit(state.copyWith(filteredTodos: state.todos));
+      return;
+    }
+    final searchedTodos = state.todos
+        .where((todo) =>
+            todo.title.toLowerCase().contains(event.query.toLowerCase()))
+        .toList();
+    searchedTodos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    emit(state.copyWith(filteredTodos: searchedTodos));
   }
 }

@@ -51,6 +51,9 @@ dependencies:
   speech_to_text: ^6.5.1
   uuid: any
   relative_time: ^5.0.0
+  table_calendar: ^3.0.9
+  sliver_tools: ^0.2.12
+  rxdart: ^0.27.7
 
 dev_dependencies:
   flutter_test:

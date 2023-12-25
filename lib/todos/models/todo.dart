@@ -3,6 +3,7 @@ class Todo {
   final String title;
   final String? description;
   final bool completed;
+  final DateTime? dueDate;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -11,6 +12,7 @@ class Todo {
     required this.title,
     this.description,
     this.completed = false,
+    this.dueDate,
     DateTime? createdAt,
     DateTime? updatedAt,
   })  : createdAt = createdAt ?? DateTime.now(),
@@ -21,6 +23,7 @@ class Todo {
     String? title,
     String? description,
     bool? completed,
+    DateTime? dueDate,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -28,6 +31,7 @@ class Todo {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
+      dueDate: dueDate ?? this.dueDate,
       completed: completed ?? this.completed,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -40,6 +44,7 @@ class Todo {
       title: data['title'],
       description: data['description'],
       completed: data['completed'],
+      dueDate: data['dueDate']?.toDate(),
       createdAt: data['createdAt']?.toDate(),
       updatedAt: data['updatedAt']?.toDate(),
     );
@@ -50,6 +55,7 @@ class Todo {
       'title': title,
       'description': description,
       'completed': completed,
+      'dueDate': dueDate,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -57,6 +63,6 @@ class Todo {
 
   @override
   String toString() {
-    return 'Todo { id: $id, title: $title, description: $description, completed: $completed, createdAt: $createdAt, updatedAt: $updatedAt }';
+    return 'Todo { id: $id, title: $title, description: $description, completed: $completed, dueDate: $dueDate, createdAt: $createdAt, updatedAt: $updatedAt }';
   }
 }

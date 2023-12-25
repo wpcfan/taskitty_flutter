@@ -18,12 +18,13 @@ class TodoListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return SliverList.builder(
+      key: key,
       itemCount: todos.length,
       itemBuilder: (context, index) {
         final todo = todos[index];
         return TodoItemWidget(
-          key: Key('__todo_item_${todo.id}'),
+          key: Key('__todo_item_${todo.id}__'),
           todo: todo,
           onToggle: onToggle,
           onEdit: onEdit,

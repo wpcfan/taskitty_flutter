@@ -67,3 +67,15 @@ class ClearError extends TodoEvent {
   @override
   List<Object> get props => [];
 }
+
+class SearchTodos extends TodoEvent {
+  final String query;
+
+  const SearchTodos(this.query);
+
+  @override
+  List<Object> get props => [query];
+
+  @override
+  String toString() => 'SearchTodos { query: $query }';
+}

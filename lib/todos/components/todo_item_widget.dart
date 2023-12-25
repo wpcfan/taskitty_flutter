@@ -34,18 +34,28 @@ class TodoItemWidget extends StatelessWidget {
       },
     );
 
+    final titleStyle = todo.completed
+        ? const TextStyle(
+            fontSize: 16,
+            decoration: TextDecoration.lineThrough,
+            color: Colors.grey,
+            fontWeight: FontWeight.bold,
+          )
+        : const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          );
+
     final title = Text(
       todo.title,
-      style: const TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-      ),
+      style: titleStyle,
     );
 
     final description = Text(
       todo.description ?? '',
       style: const TextStyle(
         fontSize: 16,
+        color: Colors.grey,
       ),
     );
 
