@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:relative_time/relative_time.dart';
 
+import '../../common/common.dart';
 import '../models/models.dart';
 
 class TodoItemWidget extends StatelessWidget {
@@ -67,29 +68,23 @@ class TodoItemWidget extends StatelessWidget {
       ),
     );
 
-    final bottomRow = Row(
+    final bottomRow = [
+      description,
+      updated,
+    ].toRow(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        description,
-        updated,
-      ],
     );
 
-    final column = Column(
+    final column = [
+      title,
+      bottomRow,
+    ].toColumn(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        title,
-        bottomRow,
-      ],
     );
-    final row = Row(
-      children: [
-        completedStatus,
-        Expanded(
-          child: column,
-        ),
-      ],
-    );
+    final row = [
+      completedStatus,
+      column.expanded(),
+    ].toRow();
 
     final rowWithBorder = Container(
       decoration: const BoxDecoration(

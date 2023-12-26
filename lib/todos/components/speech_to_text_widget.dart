@@ -5,6 +5,7 @@ import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
+import '../../common/common.dart';
 import '../../constants.dart';
 
 class SpeechToTextWidget extends StatefulWidget {
@@ -120,36 +121,30 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
           ? _startListening
           : _stopListening,
     );
-    return Column(
-      children: <Widget>[
+    return [
+      Text(
+        // If listening is active show the recognized words
+        _speechToText.isListening
+            ? _lastWords
+            // If listening isn't active but could be tell the user
+            // how to start it, otherwise indicate that speech
+            // recognition is not yet ready or not supported on
+            // the target device
+            : _speechEnabled
+                ? AppLocalizations.of(context)!.tapToStart
+                : AppLocalizations.of(context)!.speechNotAvailable,
+      ),
+      Center(child: mic),
+      if (isDevelopment && _lastError.isNotEmpty)
         Text(
-          // If listening is active show the recognized words
-          _speechToText.isListening
-              ? _lastWords
-              // If listening isn't active but could be tell the user
-              // how to start it, otherwise indicate that speech
-              // recognition is not yet ready or not supported on
-              // the target device
-              : _speechEnabled
-                  ? AppLocalizations.of(context)!.tapToStart
-                  : AppLocalizations.of(context)!.speechNotAvailable,
-        ),
-        Center(child: mic),
-        if (isDevelopment && _lastError.isNotEmpty)
-          Center(
-            child: Text(
-              _lastError,
-              style: const TextStyle(color: Colors.red),
-            ),
-          ),
-        if (isDevelopment && _lastStatus.isNotEmpty)
-          Center(
-            child: Text(
-              _lastStatus,
-              style: const TextStyle(color: Colors.green),
-            ),
-          ),
-      ],
-    );
+          _lastError,
+          style: const TextStyle(color: Colors.red),
+        ).center(),
+      if (isDevelopment && _lastStatus.isNotEmpty)
+        Text(
+          _lastStatus,
+          style: const TextStyle(color: Colors.green),
+        ).center(),
+    ].toColumn();
   }
 }

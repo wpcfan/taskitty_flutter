@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../common/common.dart';
 import 'blocs/blocs.dart';
 import 'constants.dart';
 
@@ -21,63 +22,55 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
     return BlocProvider(
       create: (context) => LoginBloc(auth: auth),
       child: Builder(builder: (context) {
         return BlocConsumer<LoginBloc, LoginState>(
           listener: listenStateChange,
-          builder: (context, state) {
-            if (state is LoginLoading) {
-              return const Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(AppLocalizations.of(context)!.loginTitle),
-              ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Form(
-                    key: formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        buildEmailField(emailController, context),
-                        buildPasswordField(passwordController, context),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: buildLoginButton(formKey, context,
-                                  emailController, passwordController),
-                            ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: buildForgotPasswordButton(context),
-                            ),
-                          ],
-                        ),
-                        buildNotRegisteredButton(context),
-                        const SizedBox(height: 20),
-                        buildLoginWithGoogleButton(context),
-                        const SizedBox(height: 20),
-                        buildLoginWithAppleButton(context),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+          builder: buildChild,
         );
       }),
+    );
+  }
+
+  Widget buildChild(context, state) {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    if (state is LoginLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.loginTitle),
+      ),
+      body: [
+        buildEmailField(emailController, context),
+        buildPasswordField(passwordController, context),
+        const SizedBox(height: 20),
+        [
+          buildLoginButton(
+                  formKey, context, emailController, passwordController)
+              .expanded(),
+          const SizedBox(width: 20),
+          buildForgotPasswordButton(context).expanded(),
+        ].toRow(),
+        buildNotRegisteredButton(context),
+        const SizedBox(height: 20),
+        buildLoginWithGoogleButton(context),
+        const SizedBox(height: 20),
+        buildLoginWithAppleButton(context),
+      ]
+          .toColumn(
+            mainAxisAlignment: MainAxisAlignment.center,
+          )
+          .form(formKey: formKey)
+          .padding(all: 16)
+          .scrollable(),
     );
   }
 

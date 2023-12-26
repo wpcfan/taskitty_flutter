@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sliver_tools/sliver_tools.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:taskitty_flutter/common/common.dart';
 
 import '../blocs/blocs.dart';
 import '../components/components.dart';
@@ -26,23 +26,25 @@ class TodoListPage extends StatelessWidget {
       )..add(const LoadTodos()),
       child: Builder(builder: (context) {
         return BlocConsumer<TodoBloc, TodoState>(
-          listener: (context, state) {
-            if (state.error.isNotEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.error),
-                ),
-              );
-
-              context.read<TodoBloc>().add(const ClearError());
-            }
-          },
+          listener: listenStateChanges,
           builder: (context, state) {
             return _buildBody(context, state);
           },
         );
       }),
     );
+  }
+
+  void listenStateChanges(context, state) {
+    if (state.error.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(state.error),
+        ),
+      );
+
+      context.read<TodoBloc>().add(const ClearError());
+    }
   }
 
   Widget _buildBody(BuildContext context, TodoState state) {
@@ -85,15 +87,8 @@ class TodoListPage extends StatelessWidget {
             bloc.add(SearchTodos(value));
           },
         ),
-        sliver: MultiSliver(children: [
-          SliverPadding(
-            padding: const EdgeInsets.all(10),
-            sliver: SliverToBoxAdapter(
-              child: calendar,
-            ),
-          ),
-          todoList
-        ]),
+        sliver: [calendar.toSliver().sliverPadding(all: 10), todoList]
+            .toMultiSliver(),
         onRefresh: () async {
           bloc.add(const LoadTodos());
           await bloc.stream.firstWhere((state) => !state.loading);

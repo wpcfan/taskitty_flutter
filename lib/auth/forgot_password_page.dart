@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../common/common.dart';
 import 'blocs/blocs.dart';
 import 'constants.dart';
 
@@ -15,42 +16,39 @@ class ForgotPasswordPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
     return BlocProvider(
       create: (context) => LoginBloc(auth: auth),
       child: Builder(builder: (context) {
         return BlocConsumer<LoginBloc, LoginState>(
           listener: listenStateChange,
-          builder: (context, state) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(AppLocalizations.of(context)!.forgotPasswordTitle),
-              ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Form(
-                    key: formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        buildEmailField(emailController, context),
-                        const SizedBox(height: 20),
-                        buildResetPasswordHint(context),
-                        const SizedBox(height: 20),
-                        buildResetPasswordButton(formKey, context,
-                            emailController, passwordController),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+          builder: buildChild,
         );
       }),
+    );
+  }
+
+  Widget buildChild(context, state) {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.forgotPasswordTitle),
+      ),
+      body: [
+        buildEmailField(emailController, context),
+        const SizedBox(height: 20),
+        buildResetPasswordHint(context),
+        const SizedBox(height: 20),
+        buildResetPasswordButton(
+            formKey, context, emailController, passwordController),
+      ]
+          .toColumn(
+            mainAxisAlignment: MainAxisAlignment.center,
+          )
+          .form(formKey: formKey)
+          .padding(all: 16)
+          .scrollable(),
     );
   }
 

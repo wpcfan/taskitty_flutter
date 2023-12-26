@@ -4,6 +4,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:taskitty_flutter/todos/todos.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../common/common.dart';
+
 class AddTodoPage extends StatelessWidget {
   final FirebaseAnalytics analytics;
   const AddTodoPage({
@@ -23,19 +25,18 @@ class AddTodoPage extends StatelessWidget {
     );
   }
 
-  SafeArea buildScaffoldBody(
+  Widget buildScaffoldBody(
       TextEditingController textEditingController, BuildContext context) {
-    return SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          buildInput(textEditingController, context),
-          buildSpeechToText(textEditingController),
-          buildConfirm(textEditingController, context),
-        ],
-      ),
-    );
+    return [
+      buildInput(textEditingController, context),
+      buildSpeechToText(textEditingController),
+      buildConfirm(textEditingController, context),
+    ]
+        .toColumn(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+        )
+        .safeArea();
   }
 
   AppBar buildAppBar(BuildContext context) {
@@ -44,16 +45,14 @@ class AddTodoPage extends StatelessWidget {
     );
   }
 
-  Expanded buildSpeechToText(TextEditingController textEditingController) {
-    return Expanded(
-      child: SpeechToTextWidget(
-        analytics: analytics,
-        onVoiceRecognized: (text) {
-          textEditingController.text = text;
-          debugPrint('Voice recognized: $text');
-        },
-      ),
-    );
+  Widget buildSpeechToText(TextEditingController textEditingController) {
+    return SpeechToTextWidget(
+      analytics: analytics,
+      onVoiceRecognized: (text) {
+        textEditingController.text = text;
+        debugPrint('Voice recognized: $text');
+      },
+    ).expanded();
   }
 
   ElevatedButton buildConfirm(
@@ -81,22 +80,19 @@ class AddTodoPage extends StatelessWidget {
     );
   }
 
-  Padding buildInput(
+  Widget buildInput(
       TextEditingController textEditingController, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: TextField(
-        controller: textEditingController,
-        decoration: InputDecoration(
-          hintText: AppLocalizations.of(context)!.addTodoHintText,
-          suffixIcon: IconButton(
-            icon: const Icon(Icons.clear),
-            onPressed: () {
-              textEditingController.clear();
-            },
-          ),
+    return TextField(
+      controller: textEditingController,
+      decoration: InputDecoration(
+        hintText: AppLocalizations.of(context)!.addTodoHintText,
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            textEditingController.clear();
+          },
         ),
       ),
-    );
+    ).padding(all: 16);
   }
 }
