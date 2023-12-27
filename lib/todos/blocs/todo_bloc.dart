@@ -9,7 +9,9 @@ import 'todo_states.dart';
 class TodoBloc extends Bloc<TodoEvent, TodoState> {
   final FirebaseFirestore firestore;
   final FirebaseAuth auth;
-  static const collectionName = 'todos';
+  static const collectionTodos = 'todos';
+  static const collectionTags = 'tags';
+
   TodoBloc({
     required this.firestore,
     required this.auth,
@@ -25,27 +27,27 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
   void _mapToggleTodoToState(ToggleTodo event, Emitter<TodoState> emit) async {
     final updatedTodo = event.todo.copyWith(completed: !event.todo.completed);
-    await _mapUpdateTodoToState(
-        UpdateTodo(
-          updatedTodo,
-        ),
-        emit);
+    await _mapUpdateTodoToState(UpdateTodo(updatedTodo), emit);
   }
 
   Future<void> _mapLoadTodosToState(
       LoadTodos event, Emitter<TodoState> emit) async {
     emit(state.copyWith(loading: true));
     try {
+      final topTags = await getTopTags();
       final todos = await firestore
-          .collection(collectionName)
+          .collection(collectionTodos)
           .doc(auth.currentUser!.uid)
           .get();
       if (todos.data() == null) {
         await firestore
-            .collection(collectionName)
+            .collection(collectionTodos)
             .doc(auth.currentUser!.uid)
             .set(<String, dynamic>{});
-        emit(state.copyWith(loading: false));
+        emit(state.copyWith(
+          loading: false,
+          topTags: topTags,
+        ));
       } else {
         final List<Todo> mappedTodos = todos
             .data()!
@@ -58,6 +60,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
           todos: mappedTodos,
           filteredTodos: mappedTodos,
           loading: false,
+          topTags: topTags,
         ));
       }
     } catch (e) {
@@ -68,36 +71,79 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   Future<void> _mapAddTodoToState(
       AddTodo event, Emitter<TodoState> emit) async {
     try {
+      // get user todos
       final todos = await firestore
-          .collection(collectionName)
+          .collection(collectionTodos)
           .doc(auth.currentUser!.uid)
           .get();
-
+      // remove duplicate tags
+      final uniqueTags = removeDuplicateTags(event.todo.tags ?? []);
+      // update tag counts
+      await updateTagCounts(uniqueTags);
+      final updatedTodo = event.todo.copyWith(tags: uniqueTags);
+      // update remote todo
       await todos.reference
-          .update(<String, dynamic>{event.todo.id!: event.todo.toMap()});
-      emit(state.copyWith(todos: [event.todo, ...state.todos], loading: false));
+          .update(<String, dynamic>{event.todo.id!: updatedTodo.toMap()});
+      emit(
+          state.copyWith(todos: [updatedTodo, ...state.todos], loading: false));
     } catch (e) {
       emit(state.copyWith(error: e.toString(), loading: false));
     }
   }
 
+  Future<void> updateTagCounts(List<String> tags) async {
+    // 更新标签计数
+    final tagsRef = firestore.collection(collectionTags);
+
+    for (var tag in tags) {
+      final tagRef = tagsRef.doc(tag);
+
+      // 在Firebase事务中更新标签计数
+      await firestore.runTransaction((transaction) async {
+        final tagDoc = await transaction.get(tagRef);
+        if (tagDoc.exists) {
+          final count = tagDoc.data()!['count'] + 1;
+          transaction.update(tagRef, {'count': count});
+        } else {
+          transaction.set(tagRef, {'count': 1});
+        }
+      });
+    }
+  }
+
+  Future<List<String>> getTopTags({int limit = 10}) async {
+    // 获取所有标签，并按计数排序
+    final tagsRef = firestore.collection(collectionTags);
+    final sortedTags =
+        await tagsRef.orderBy('count', descending: true).limit(limit).get();
+
+    // 返回前十个标签
+    return sortedTags.docs.map((tag) => tag.id).toList();
+  }
+
   Future<void> _mapUpdateTodoToState(
       UpdateTodo event, Emitter<TodoState> emit) async {
     try {
+      // update remote todo
       await firestore
-          .collection(collectionName)
+          .collection(collectionTodos)
           .doc(auth.currentUser!.uid)
           .update(<String, dynamic>{
         event.updatedTodo.id!: event.updatedTodo.toMap()
       });
+      // update local todo
       final updatedTodos = state.todos.map((todo) {
         return todo.id == event.updatedTodo.id ? event.updatedTodo : todo;
       }).toList();
+      // order todos by updatedAt
       updatedTodos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      // update filteredTodos
       final updatedFilteredTodos = state.filteredTodos.map((todo) {
         return todo.id == event.updatedTodo.id ? event.updatedTodo : todo;
       }).toList();
+      // order filteredTodos by updatedAt
       updatedFilteredTodos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+
       emit(state.copyWith(
         todos: updatedTodos,
         filteredTodos: updatedFilteredTodos,
@@ -111,14 +157,18 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   Future<void> _mapDeleteTodoToState(
       DeleteTodo event, Emitter<TodoState> emit) async {
     try {
+      // update tag counts
       await firestore
-          .collection(collectionName)
+          .collection(collectionTodos)
           .doc(auth.currentUser!.uid)
           .update(<String, dynamic>{event.id: FieldValue.delete()});
+      // decrease tag counts
       final updatedTodos =
           state.todos.where((todo) => todo.id != event.id).toList();
+      // order todos by updatedAt
       final updatedFilteredTodos =
           state.filteredTodos.where((todo) => todo.id != event.id).toList();
+
       emit(state.copyWith(
         todos: updatedTodos,
         filteredTodos: updatedFilteredTodos,
@@ -138,11 +188,19 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       emit(state.copyWith(filteredTodos: state.todos));
       return;
     }
+    // filter todos by query
     final searchedTodos = state.todos
-        .where((todo) =>
-            todo.title.toLowerCase().contains(event.query.toLowerCase()))
+        .where((todo) => (todo.title ?? '')
+            .toLowerCase()
+            .contains(event.query.toLowerCase()))
         .toList();
+    // order todos by updatedAt
     searchedTodos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    // update filteredTodos
     emit(state.copyWith(filteredTodos: searchedTodos));
+  }
+
+  List<String> removeDuplicateTags(List<String> tags) {
+    return tags.map((tag) => tag.toLowerCase()).toSet().toList();
   }
 }

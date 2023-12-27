@@ -6,31 +6,53 @@ import 'package:uuid/uuid.dart';
 
 import '../../common/common.dart';
 
-class AddTodoPage extends StatelessWidget {
+class AddTodoPage extends StatefulWidget {
   final FirebaseAnalytics analytics;
+  final List<String> topTags;
   const AddTodoPage({
     super.key,
     required this.analytics,
+    this.topTags = const [],
   });
 
   @override
-  Widget build(BuildContext context) {
-    // a text field which will display a hint when empty
-    // and will display a clear button when text is entered
-    final textEditingController = TextEditingController();
+  State<AddTodoPage> createState() => _AddTodoPageState();
+}
 
-    return Scaffold(
-      appBar: buildAppBar(context),
-      body: buildScaffoldBody(textEditingController, context),
+class _AddTodoPageState extends State<AddTodoPage> {
+  late List<String> _tags;
+  late TextEditingController _textEditingController;
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController = TextEditingController();
+    _tags = [];
+    widget.analytics.setCurrentScreen(
+      screenName: 'AddTodoPage',
+      screenClassOverride: 'AddTodoPage',
     );
   }
 
-  Widget buildScaffoldBody(
-      TextEditingController textEditingController, BuildContext context) {
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: buildAppBar(context),
+      body: buildScaffoldBody(context),
+    );
+  }
+
+  Widget buildScaffoldBody(BuildContext context) {
     return [
-      buildInput(textEditingController, context),
-      buildSpeechToText(textEditingController),
-      buildConfirm(textEditingController, context),
+      buildInput(context),
+      buildSpeechToText(),
+      buildTags(),
+      const Spacer(),
+      buildConfirm(context),
     ]
         .toColumn(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -39,34 +61,47 @@ class AddTodoPage extends StatelessWidget {
         .safeArea();
   }
 
+  Widget buildTags() {
+    return TagsWidget(
+      topTags: widget.topTags,
+      onTagChanged: (tags) {
+        setState(() {
+          _tags = tags;
+        });
+        debugPrint('Tags changed: $tags');
+      },
+    );
+  }
+
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
       title: Text(AppLocalizations.of(context)!.addTodoPageTitle),
     );
   }
 
-  Widget buildSpeechToText(TextEditingController textEditingController) {
+  Widget buildSpeechToText() {
     return SpeechToTextWidget(
-      analytics: analytics,
+      analytics: widget.analytics,
       onVoiceRecognized: (text) {
-        textEditingController.text = text;
+        _textEditingController.text = text;
         debugPrint('Voice recognized: $text');
       },
-    ).expanded();
+    );
   }
 
-  ElevatedButton buildConfirm(
-      TextEditingController textEditingController, BuildContext context) {
+  ElevatedButton buildConfirm(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        if (textEditingController.text.trim().isNotEmpty) {
-          final todo = Todo(
-            id: const Uuid().v4(),
-            title: textEditingController.text,
-          );
-
-          textEditingController.clear();
-          Navigator.pop(context, todo);
+        if (_textEditingController.text.trim().isNotEmpty) {
+          setState(() {
+            final todo = Todo(
+              id: const Uuid().v4(),
+              title: _textEditingController.text.trim(),
+              tags: _tags,
+            );
+            _textEditingController.clear();
+            Navigator.pop(context, todo);
+          });
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -80,16 +115,15 @@ class AddTodoPage extends StatelessWidget {
     );
   }
 
-  Widget buildInput(
-      TextEditingController textEditingController, BuildContext context) {
+  Widget buildInput(BuildContext context) {
     return TextField(
-      controller: textEditingController,
+      controller: _textEditingController,
       decoration: InputDecoration(
         hintText: AppLocalizations.of(context)!.addTodoHintText,
         suffixIcon: IconButton(
           icon: const Icon(Icons.clear),
           onPressed: () {
-            textEditingController.clear();
+            _textEditingController.clear();
           },
         ),
       ),

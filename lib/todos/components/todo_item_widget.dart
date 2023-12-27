@@ -48,7 +48,7 @@ class TodoItemWidget extends StatelessWidget {
           );
 
     final title = Text(
-      todo.title,
+      todo.title ?? '',
       style: titleStyle,
     );
 

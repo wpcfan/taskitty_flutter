@@ -63,4 +63,30 @@ extension ListWidget<E> on List<Widget> {
         clipBehavior: clipBehavior,
         children: this,
       );
+
+  Widget toWrap({
+    Key? key,
+    Axis direction = Axis.horizontal,
+    WrapAlignment alignment = WrapAlignment.start,
+    double spacing = 0.0,
+    WrapAlignment runAlignment = WrapAlignment.start,
+    double runSpacing = 0.0,
+    WrapCrossAlignment crossAxisAlignment = WrapCrossAlignment.start,
+    TextDirection textDirection = TextDirection.ltr,
+    VerticalDirection verticalDirection = VerticalDirection.down,
+    TextBaseline? textBaseline,
+    List<Widget> children = const <Widget>[],
+  }) =>
+      Wrap(
+        key: key,
+        direction: direction,
+        alignment: alignment,
+        spacing: spacing,
+        runAlignment: runAlignment,
+        runSpacing: runSpacing,
+        crossAxisAlignment: crossAxisAlignment,
+        textDirection: textDirection,
+        verticalDirection: verticalDirection,
+        children: this,
+      );
 }

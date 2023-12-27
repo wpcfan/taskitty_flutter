@@ -7,6 +7,7 @@ import 'package:taskitty_flutter/common/common.dart';
 
 import '../blocs/blocs.dart';
 import '../components/components.dart';
+import '../models/models.dart';
 
 class TodoListPage extends StatelessWidget {
   final FirebaseFirestore firestore;
@@ -27,9 +28,7 @@ class TodoListPage extends StatelessWidget {
       child: Builder(builder: (context) {
         return BlocConsumer<TodoBloc, TodoState>(
           listener: listenStateChanges,
-          builder: (context, state) {
-            return _buildBody(context, state);
-          },
+          builder: (context, state) => _buildBody(context, state),
         );
       }),
     );
@@ -82,7 +81,12 @@ class TodoListPage extends StatelessWidget {
         decoration: decoration,
         sliverAppBar: MySliverAppBar(
           decoration: decoration,
-          onRightIconTap: () => Navigator.of(context).pushNamed('/add_todo'),
+          onRightIconTap: () async {
+            final todo = await Navigator.of(context).pushNamed('/add_todo');
+            if (todo != null) {
+              bloc.add(AddTodo(todo as Todo));
+            }
+          },
           onChanged: (value) {
             bloc.add(SearchTodos(value));
           },

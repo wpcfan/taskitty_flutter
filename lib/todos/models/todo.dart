@@ -1,7 +1,8 @@
 class Todo {
   final String? id;
-  final String title;
+  final String? title;
   final String? description;
+  final List<String>? tags;
   final bool completed;
   final DateTime? dueDate;
   final DateTime createdAt;
@@ -9,8 +10,9 @@ class Todo {
 
   Todo({
     this.id,
-    required this.title,
+    this.title,
     this.description,
+    this.tags,
     this.completed = false,
     this.dueDate,
     DateTime? createdAt,
@@ -22,6 +24,7 @@ class Todo {
     String? id,
     String? title,
     String? description,
+    List<String>? tags,
     bool? completed,
     DateTime? dueDate,
     DateTime? createdAt,
@@ -31,6 +34,7 @@ class Todo {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
+      tags: tags ?? this.tags,
       dueDate: dueDate ?? this.dueDate,
       completed: completed ?? this.completed,
       createdAt: createdAt ?? this.createdAt,
@@ -43,6 +47,7 @@ class Todo {
       id: todoId,
       title: data['title'],
       description: data['description'],
+      tags: List<String>.from(data['tags'] ?? []),
       completed: data['completed'],
       dueDate: data['dueDate']?.toDate(),
       createdAt: data['createdAt']?.toDate(),
@@ -54,6 +59,7 @@ class Todo {
     return {
       'title': title,
       'description': description,
+      'tags': tags,
       'completed': completed,
       'dueDate': dueDate,
       'createdAt': createdAt,
@@ -63,6 +69,6 @@ class Todo {
 
   @override
   String toString() {
-    return 'Todo { id: $id, title: $title, description: $description, completed: $completed, dueDate: $dueDate, createdAt: $createdAt, updatedAt: $updatedAt }';
+    return 'Todo { id: $id, title: $title, description: $description, tags: $tags, completed: $completed, dueDate: $dueDate, createdAt: $createdAt, updatedAt: $updatedAt }';
   }
 }
