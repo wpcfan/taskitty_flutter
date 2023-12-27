@@ -82,7 +82,9 @@ class TodoListPage extends StatelessWidget {
         sliverAppBar: MySliverAppBar(
           decoration: decoration,
           onRightIconTap: () async {
-            final todo = await Navigator.of(context).pushNamed('/add_todo');
+            final topTags = state.topTags;
+            final todo = await Navigator.of(context)
+                .pushNamed('/add_todo', arguments: topTags);
             if (todo != null) {
               bloc.add(AddTodo(todo as Todo));
             }

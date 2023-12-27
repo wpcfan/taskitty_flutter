@@ -8,11 +8,10 @@ import '../../common/common.dart';
 
 class AddTodoPage extends StatefulWidget {
   final FirebaseAnalytics analytics;
-  final List<String> topTags;
+
   const AddTodoPage({
     super.key,
     required this.analytics,
-    this.topTags = const [],
   });
 
   @override
@@ -47,10 +46,11 @@ class _AddTodoPageState extends State<AddTodoPage> {
   }
 
   Widget buildScaffoldBody(BuildContext context) {
+    final topTags = ModalRoute.of(context)?.settings.arguments as List<String>?;
     return [
       buildInput(context),
       buildSpeechToText(),
-      buildTags(),
+      buildTags(topTags ?? []),
       const Spacer(),
       buildConfirm(context),
     ]
@@ -61,9 +61,9 @@ class _AddTodoPageState extends State<AddTodoPage> {
         .safeArea();
   }
 
-  Widget buildTags() {
+  Widget buildTags(List<String> topTags) {
     return TagsWidget(
-      topTags: widget.topTags,
+      topTags: topTags,
       onTagChanged: (tags) {
         setState(() {
           _tags = tags;

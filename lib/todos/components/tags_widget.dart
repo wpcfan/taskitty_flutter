@@ -100,8 +100,8 @@ class _TagsWidgetState extends State<TagsWidget> {
       tagInput,
       if (widget.topTags.isNotEmpty)
         Text(widget.topTagsHintText, style: widget.topTagsHintTextStyle)
-            .padding(vertical: 10.0),
-      if (widget.topTags.isNotEmpty) topTagsList,
+            .padding(all: 10.0),
+      if (widget.topTags.isNotEmpty) topTagsList.padding(all: 10.0),
     ].toColumn(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
