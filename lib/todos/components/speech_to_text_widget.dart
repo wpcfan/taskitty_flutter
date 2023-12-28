@@ -133,18 +133,18 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
             : _speechEnabled
                 ? AppLocalizations.of(context)!.tapToStart
                 : AppLocalizations.of(context)!.speechNotAvailable,
-      ),
+      ).expanded(),
       Center(child: mic),
       if (isDevelopment && _lastError.isNotEmpty)
         Text(
           _lastError,
           style: const TextStyle(color: Colors.red),
-        ).center(),
+        ).center().expanded(),
       if (isDevelopment && _lastStatus.isNotEmpty)
         Text(
           _lastStatus,
           style: const TextStyle(color: Colors.green),
-        ).center(),
+        ).center().expanded(),
     ].toColumn();
   }
 }

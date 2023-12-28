@@ -1,3 +1,4 @@
+export 'due_date_widget.dart';
 export 'my_custom_scroll_view.dart';
 export 'my_sliver_app_bar.dart';
 export 'speech_to_text_widget.dart';

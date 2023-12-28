@@ -138,5 +138,9 @@
   "addTodoErrorTextIsEmpty": "Text is empty",
   "@addTodoErrorTextIsEmpty": {
     "description": "The error message when the text field is empty"
+  },
+  "addTodoErrorDueDateNotSelected": "Due date is not selected",
+  "@addTodoErrorDueDateNotSelected": {
+    "description": "The error message when the due date is not selected"
   }
 }

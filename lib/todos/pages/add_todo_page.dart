@@ -21,6 +21,8 @@ class AddTodoPage extends StatefulWidget {
 class _AddTodoPageState extends State<AddTodoPage> {
   late List<String> _tags;
   late TextEditingController _textEditingController;
+  DateTime? _dueDate;
+
   @override
   void initState() {
     super.initState();
@@ -48,15 +50,19 @@ class _AddTodoPageState extends State<AddTodoPage> {
   Widget buildScaffoldBody(BuildContext context) {
     final topTags = ModalRoute.of(context)?.settings.arguments as List<String>?;
     return [
-      buildInput(context),
-      buildSpeechToText(),
-      buildTags(topTags ?? []),
-      const Spacer(),
+      buildInput(context).expanded(),
+      buildSpeechToText().expanded(),
+      buildTags(topTags ?? []).expanded(),
+      buildDueDate().expanded(),
       buildConfirm(context),
     ]
         .toColumn(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
+        )
+        .constrained(maxHeight: 600)
+        .scrollable(
+          padding: const EdgeInsets.all(16),
         )
         .safeArea();
   }
@@ -79,6 +85,29 @@ class _AddTodoPageState extends State<AddTodoPage> {
     );
   }
 
+  Widget buildDueDate() {
+    final now = DateTime.now();
+    return DueDateWidget(
+      initialDate: now,
+      firstDate: now.subtract(const Duration(days: 365)),
+      lastDate: now.add(const Duration(days: 365)),
+      onDateChanged: (date) {
+        setState(() {
+          _dueDate = DateTime.parse(date);
+        });
+      },
+      onDateNotSelected: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.addTodoErrorDueDateNotSelected,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget buildSpeechToText() {
     return SpeechToTextWidget(
       analytics: widget.analytics,
@@ -98,6 +127,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
               id: const Uuid().v4(),
               title: _textEditingController.text.trim(),
               tags: _tags,
+              dueDate: _dueDate,
             );
             _textEditingController.clear();
             Navigator.pop(context, todo);
@@ -127,6 +157,6 @@ class _AddTodoPageState extends State<AddTodoPage> {
           },
         ),
       ),
-    ).padding(all: 16);
+    );
   }
 }

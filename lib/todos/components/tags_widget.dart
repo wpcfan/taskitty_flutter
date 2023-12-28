@@ -97,11 +97,11 @@ class _TagsWidgetState extends State<TagsWidget> {
           runSpacing: 5.0,
         );
     return [
-      tagInput,
+      tagInput.expanded(),
       if (widget.topTags.isNotEmpty)
         Text(widget.topTagsHintText, style: widget.topTagsHintTextStyle)
-            .padding(all: 10.0),
-      if (widget.topTags.isNotEmpty) topTagsList.padding(all: 10.0),
+            .expanded(),
+      if (widget.topTags.isNotEmpty) topTagsList.expanded(),
     ].toColumn(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -188,7 +188,7 @@ class _TagsWidgetState extends State<TagsWidget> {
           widget.onTagChanged?.call(_controller.getTags ?? []);
         },
         onSubmitted: onSubmitted,
-      ).padding(all: 10.0);
+      );
     });
   }
 }
