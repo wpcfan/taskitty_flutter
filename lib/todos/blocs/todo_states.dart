@@ -9,6 +9,7 @@ class TodoState extends Equatable {
   final String error;
   final List<String> topTags;
   final DateTime? selectedDate;
+
   List<Todo> get todosBySelectedDate => todos
       .where((todo) =>
           todo.dueDate != null &&

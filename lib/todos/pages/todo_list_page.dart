@@ -87,7 +87,14 @@ class TodoListPage extends StatelessWidget {
         ],
       ),
     );
-
+    final sliver = state.loading && state.todos.isEmpty
+        ? const SliverFillRemaining(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        : [calendar.toSliver().sliverPadding(all: 10), todoList]
+            .toMultiSliver();
     return Scaffold(
       body: MyCustomScrollView(
         decoration: decoration,
@@ -105,8 +112,7 @@ class TodoListPage extends StatelessWidget {
             bloc.add(SearchTodos(value));
           },
         ),
-        sliver: [calendar.toSliver().sliverPadding(all: 10), todoList]
-            .toMultiSliver(),
+        sliver: sliver,
         onRefresh: () async {
           bloc.add(const LoadTodos());
           await bloc.stream.firstWhere((state) => !state.loading);
