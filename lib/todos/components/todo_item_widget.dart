@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:relative_time/relative_time.dart';
 
@@ -115,24 +116,14 @@ class TodoItemWidget extends StatelessWidget {
           showDialog(
             context: context,
             builder: (context) {
-              return AlertDialog(
-                title: const Text('Delete Todo'),
-                content: const Text('Are you sure you want to delete this?'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      onDelete!(todo);
-                    },
-                    child: const Text('Delete'),
-                  ),
-                ],
+              return ConfirmDialog(
+                title: AppLocalizations.of(context)!.confirmDeleteTitle,
+                content: AppLocalizations.of(context)!.confirmDeleteContent,
+                onClose: (result) {
+                  if (result) {
+                    onDelete!(todo);
+                  }
+                },
               );
             },
           );

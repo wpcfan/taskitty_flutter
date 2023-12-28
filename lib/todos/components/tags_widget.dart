@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 
 import '../../common/common.dart';
@@ -7,7 +8,6 @@ class TagsWidget extends StatefulWidget {
   final List<String> initialTags;
   final List<String> topTags;
   final String? helperText;
-  final String hintText;
   final Color inputBorderColor;
   final Color focusBorderColor;
   final Color tagBorderColor;
@@ -15,17 +15,15 @@ class TagsWidget extends StatefulWidget {
   final Color deleteIconColor;
   final double inputBorderWidth;
   final double focusBorderWidth;
-  final String topTagsHintText;
   final TextStyle topTagsHintTextStyle;
-  final String duplicateTagError;
   final Function(String)? onSelected;
   final Function(List<String>)? onTagChanged;
+
   const TagsWidget({
     super.key,
     this.initialTags = const [],
     this.topTags = const [],
     this.helperText,
-    this.hintText = 'Enter tag...',
     this.inputBorderColor = Colors.grey,
     this.focusBorderColor = Colors.purple,
     this.tagBorderColor = Colors.purple,
@@ -33,12 +31,10 @@ class TagsWidget extends StatefulWidget {
     this.deleteIconColor = Colors.white38,
     this.inputBorderWidth = 3.0,
     this.focusBorderWidth = 3.0,
-    this.topTagsHintText = 'You may be interested in these tags, select to add',
     this.topTagsHintTextStyle = const TextStyle(
       color: Colors.grey,
       fontSize: 12.0,
     ),
-    this.duplicateTagError = 'Tag already exists',
     this.onSelected,
     this.onTagChanged,
   });
@@ -78,7 +74,7 @@ class _TagsWidgetState extends State<TagsWidget> {
       letterCase: LetterCase.normal,
       validator: (String tag) {
         if ((_controller.getTags ?? []).contains(tag)) {
-          return widget.duplicateTagError;
+          return AppLocalizations.of(context)!.duplicateTagError;
         }
         return null;
       },
@@ -99,8 +95,10 @@ class _TagsWidgetState extends State<TagsWidget> {
     return [
       tagInput.expanded(),
       if (widget.topTags.isNotEmpty)
-        Text(widget.topTagsHintText, style: widget.topTagsHintTextStyle)
-            .expanded(),
+        Text(
+          AppLocalizations.of(context)!.topTagsHintText,
+          style: widget.topTagsHintTextStyle,
+        ).expanded(),
       if (widget.topTags.isNotEmpty) topTagsList.expanded(),
     ].toColumn(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,7 +175,9 @@ class _TagsWidgetState extends State<TagsWidget> {
           focusedBorder: focusBorder,
           helperText: widget.helperText,
           helperStyle: helperStyle,
-          hintText: _controller.hasTags ? '' : widget.hintText,
+          hintText: _controller.hasTags
+              ? ''
+              : AppLocalizations.of(context)!.tagsHintText,
           errorText: error,
           prefixIconConstraints:
               BoxConstraints(maxWidth: _distanceToField * 0.74),

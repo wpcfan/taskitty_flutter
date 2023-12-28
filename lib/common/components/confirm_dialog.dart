@@ -5,6 +5,7 @@ class ConfirmDialog extends StatelessWidget {
   final String content;
   final String confirmText;
   final String cancelText;
+  final Function(bool)? onClose;
 
   const ConfirmDialog({
     super.key,
@@ -12,6 +13,7 @@ class ConfirmDialog extends StatelessWidget {
     required this.content,
     this.confirmText = '确定',
     this.cancelText = '取消',
+    this.onClose,
   });
 
   @override
@@ -21,12 +23,16 @@ class ConfirmDialog extends StatelessWidget {
       content: Text(content),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
+          onPressed: () {
+            Navigator.of(context).pop(false);
+            onClose?.call(false);
+          },
           child: Text(cancelText),
         ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop(true);
+            onClose?.call(true);
           },
           child: Text(confirmText),
         ),

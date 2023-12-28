@@ -8,6 +8,7 @@ class TodoListWidget extends StatelessWidget {
   final Function(Todo)? onToggle;
   final Function(Todo)? onEdit;
   final Function(Todo)? onDelete;
+
   const TodoListWidget({
     super.key,
     this.todos = const [],
