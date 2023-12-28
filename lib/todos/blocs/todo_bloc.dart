@@ -23,6 +23,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     on<ToggleTodo>((event, emit) => _mapToggleTodoToState(event, emit));
     on<ClearError>((event, emit) => _mapClearErrorToState(event, emit));
     on<SearchTodos>((event, emit) => _mapSearchTodosToState(event, emit));
+    on<SelectDay>((event, emit) => _mapSelectDayToState(event, emit));
   }
 
   void _mapToggleTodoToState(ToggleTodo event, Emitter<TodoState> emit) async {
@@ -198,6 +199,10 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     searchedTodos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
     // update filteredTodos
     emit(state.copyWith(filteredTodos: searchedTodos));
+  }
+
+  void _mapSelectDayToState(SelectDay event, Emitter<TodoState> emit) {
+    emit(state.copyWith(selectedDate: event.selectedDay));
   }
 
   List<String> removeDuplicateTags(List<String> tags) {

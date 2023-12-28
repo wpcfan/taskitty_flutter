@@ -8,6 +8,14 @@ class TodoState extends Equatable {
   final bool loading;
   final String error;
   final List<String> topTags;
+  final DateTime? selectedDate;
+  List<Todo> get todosBySelectedDate => todos
+      .where((todo) =>
+          todo.dueDate != null &&
+          todo.dueDate!.year == selectedDate!.year &&
+          todo.dueDate!.month == selectedDate!.month &&
+          todo.dueDate!.day == selectedDate!.day)
+      .toList();
 
   const TodoState({
     this.todos = const [],
@@ -15,10 +23,18 @@ class TodoState extends Equatable {
     this.loading = false,
     this.error = '',
     this.topTags = const [],
+    this.selectedDate,
   });
 
   @override
-  List<Object?> get props => [todos, filteredTodos, loading, error, topTags];
+  List<Object?> get props => [
+        todos,
+        filteredTodos,
+        loading,
+        error,
+        topTags,
+        selectedDate,
+      ];
 
   TodoState copyWith({
     List<Todo>? todos,
@@ -26,6 +42,7 @@ class TodoState extends Equatable {
     bool? loading,
     String? error,
     List<String>? topTags,
+    DateTime? selectedDate,
   }) {
     return TodoState(
       todos: todos ?? this.todos,
@@ -33,11 +50,12 @@ class TodoState extends Equatable {
       loading: loading ?? this.loading,
       error: error ?? this.error,
       topTags: topTags ?? this.topTags,
+      selectedDate: selectedDate ?? this.selectedDate,
     );
   }
 
   @override
   String toString() {
-    return 'TodoState { todos: $todos, filteredTodos: $filteredTodos, loading: $loading, error: $error, topTags: $topTags }';
+    return 'TodoState { todos: $todos, filteredTodos: $filteredTodos, loading: $loading, error: $error, topTags: $topTags, selectedDate: $selectedDate }';
   }
 }

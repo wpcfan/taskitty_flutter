@@ -79,3 +79,15 @@ class SearchTodos extends TodoEvent {
   @override
   String toString() => 'SearchTodos { query: $query }';
 }
+
+class SelectDay extends TodoEvent {
+  final DateTime selectedDay;
+
+  const SelectDay(this.selectedDay);
+
+  @override
+  List<Object> get props => [selectedDay];
+
+  @override
+  String toString() => 'SelectDay { selectedDay: $selectedDay }';
+}

@@ -63,6 +63,18 @@ class TodoListPage extends StatelessWidget {
       lastDay: DateTime.utc(2030, 3, 14),
       focusedDay: DateTime.now(),
       calendarFormat: CalendarFormat.week,
+      onDaySelected: (selectedDay, focusedDay) {
+        bloc.add(SelectDay(selectedDay));
+      },
+      eventLoader: (day) {
+        final todos = state.todos.where((todo) {
+          return todo.dueDate?.day == day.day &&
+              todo.dueDate?.month == day.month &&
+              todo.dueDate?.year == day.year;
+        }).toList();
+
+        return todos;
+      },
     );
 
     const decoration = BoxDecoration(

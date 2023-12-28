@@ -52,13 +52,10 @@ class TodoItemWidget extends StatelessWidget {
       style: titleStyle,
     );
 
-    final description = Text(
-      todo.description ?? '',
-      style: const TextStyle(
-        fontSize: 16,
-        color: Colors.grey,
-      ),
-    );
+    final tags = (todo.tags ?? [])
+        .map((e) => Chip(label: Text(e)))
+        .toList()
+        .toRow(separator: const SizedBox(width: 5));
 
     final updated = Text(
       todo.updatedAt.relativeTime(context),
@@ -69,7 +66,7 @@ class TodoItemWidget extends StatelessWidget {
     );
 
     final bottomRow = [
-      description,
+      tags,
       updated,
     ].toRow(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -84,7 +81,9 @@ class TodoItemWidget extends StatelessWidget {
     final row = [
       completedStatus,
       column.expanded(),
-    ].toRow();
+    ].toRow(
+      crossAxisAlignment: CrossAxisAlignment.start,
+    );
 
     final rowWithBorder = Container(
       decoration: const BoxDecoration(
