@@ -81,6 +81,7 @@ class MyApp extends StatelessWidget {
         '/todos': (context) => TodoListPage(
               firestore: firestore,
               auth: auth,
+              analytics: analytics,
             ),
         '/add_todo': (context) => AddTodoPage(
               analytics: analytics,

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,14 +13,20 @@ import '../models/models.dart';
 class TodoListPage extends StatelessWidget {
   final FirebaseFirestore firestore;
   final FirebaseAuth auth;
+  final FirebaseAnalytics analytics;
   const TodoListPage({
     super.key,
     required this.firestore,
     required this.auth,
+    required this.analytics,
   });
 
   @override
   Widget build(BuildContext context) {
+    analytics.setCurrentScreen(
+      screenName: 'TodoListPage',
+      screenClassOverride: 'TodoListPage',
+    );
     return BlocProvider<TodoBloc>(
       create: (context) => TodoBloc(
         firestore: firestore,
