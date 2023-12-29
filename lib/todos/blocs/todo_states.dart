@@ -6,6 +6,7 @@ class TodoState extends Equatable {
   final List<Todo> todos;
   final List<Todo> filteredTodos;
   final bool loading;
+  final bool updating;
   final String error;
   final List<String> topTags;
   final DateTime? selectedDate;
@@ -25,6 +26,7 @@ class TodoState extends Equatable {
     this.error = '',
     this.topTags = const [],
     this.selectedDate,
+    this.updating = false,
   });
 
   @override
@@ -35,6 +37,7 @@ class TodoState extends Equatable {
         error,
         topTags,
         selectedDate,
+        updating,
       ];
 
   TodoState copyWith({
@@ -44,6 +47,7 @@ class TodoState extends Equatable {
     String? error,
     List<String>? topTags,
     DateTime? selectedDate,
+    bool? updating,
   }) {
     return TodoState(
       todos: todos ?? this.todos,
@@ -52,11 +56,12 @@ class TodoState extends Equatable {
       error: error ?? this.error,
       topTags: topTags ?? this.topTags,
       selectedDate: selectedDate ?? this.selectedDate,
+      updating: updating ?? this.updating,
     );
   }
 
   @override
   String toString() {
-    return 'TodoState { todos: $todos, filteredTodos: $filteredTodos, loading: $loading, error: $error, topTags: $topTags, selectedDate: $selectedDate }';
+    return 'TodoState { todos: $todos, filteredTodos: $filteredTodos, loading: $loading, error: $error, topTags: $topTags, selectedDate: $selectedDate, updating: $updating }';
   }
 }

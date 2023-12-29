@@ -56,6 +56,7 @@ dependencies:
   rxdart: ^0.27.7
   textfield_tags: ^2.0.2
   device_calendar: ^4.3.2
+  flutter_easyloading: any
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_calendar/device_calendar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskitty_flutter/common/extensions/extensions.dart';
 
 import '../models/models.dart';
 import 'todo_events.dart';
@@ -9,12 +11,14 @@ import 'todo_states.dart';
 class TodoBloc extends Bloc<TodoEvent, TodoState> {
   final FirebaseFirestore firestore;
   final FirebaseAuth auth;
+  final DeviceCalendarPlugin deviceCalendarPlugin;
   static const collectionTodos = 'todos';
   static const collectionTags = 'tags';
 
   TodoBloc({
     required this.firestore,
     required this.auth,
+    required this.deviceCalendarPlugin,
   }) : super(const TodoState()) {
     on<LoadTodos>((event, emit) => _mapLoadTodosToState(event, emit));
     on<AddTodo>((event, emit) => _mapAddTodoToState(event, emit));
@@ -78,7 +82,9 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     AddTodo event,
     Emitter<TodoState> emit,
   ) async {
+    emit(state.copyWith(updating: true));
     try {
+      final eventId = await createOrUpdateCalendar(event.todo);
       // get user todos
       final todos = await firestore
           .collection(collectionTodos)
@@ -88,14 +94,20 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       final uniqueTags = removeDuplicateTags(event.todo.tags ?? []);
       // update tag counts
       await updateTagCounts(uniqueTags);
-      final updatedTodo = event.todo.copyWith(tags: uniqueTags);
+      final updatedTodo =
+          event.todo.copyWith(tags: uniqueTags, eventId: eventId);
       // update remote todo
       await todos.reference
           .update(<String, dynamic>{event.todo.id!: updatedTodo.toMap()});
-      emit(
-          state.copyWith(todos: [updatedTodo, ...state.todos], loading: false));
+      final updatedTodoList = [updatedTodo, ...state.todos];
+      final filteredTodoList = [updatedTodo, ...state.filteredTodos];
+      emit(state.copyWith(
+        todos: updatedTodoList,
+        filteredTodos: filteredTodoList,
+        updating: false,
+      ));
     } catch (e) {
-      emit(state.copyWith(error: e.toString(), loading: false));
+      emit(state.copyWith(error: e.toString(), updating: false));
     }
   }
 
@@ -143,6 +155,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     UpdateTodo event,
     Emitter<TodoState> emit,
   ) async {
+    emit(state.copyWith(updating: true));
     try {
       // update remote todo
       await firestore
@@ -163,14 +176,14 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       }).toList();
       // order filteredTodos by updatedAt
       updatedFilteredTodos.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-
+      await createOrUpdateCalendar(event.updatedTodo);
       emit(state.copyWith(
         todos: updatedTodos,
         filteredTodos: updatedFilteredTodos,
-        loading: false,
+        updating: false,
       ));
     } catch (e) {
-      emit(state.copyWith(error: e.toString(), loading: false));
+      emit(state.copyWith(error: e.toString(), updating: false));
     }
   }
 
@@ -178,12 +191,15 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     DeleteTodo event,
     Emitter<TodoState> emit,
   ) async {
+    emit(state.copyWith(updating: true));
     try {
       // update tag counts
       await firestore
           .collection(collectionTodos)
           .doc(auth.currentUser!.uid)
           .update(<String, dynamic>{event.id: FieldValue.delete()});
+      final deleted = state.todos.firstWhere((todo) => todo.id == event.id);
+      await removeFromCalendar(deleted);
       final tags =
           state.todos.firstWhere((todo) => todo.id == event.id).tags ?? [];
       // decrease tag counts
@@ -199,10 +215,10 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       emit(state.copyWith(
         todos: updatedTodos,
         filteredTodos: updatedFilteredTodos,
-        loading: false,
+        updating: false,
       ));
     } catch (e) {
-      emit(state.copyWith(error: e.toString(), loading: false));
+      emit(state.copyWith(error: e.toString(), updating: false));
     }
   }
 
@@ -242,5 +258,37 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
   List<String> removeDuplicateTags(List<String> tags) {
     return tags.map((tag) => tag.toLowerCase()).toSet().toList();
+  }
+
+  // create or update due date to device calendar
+  Future<String?> createOrUpdateCalendar(Todo todo) async {
+    if (todo.dueDate == null) {
+      return Future.value(null);
+    }
+    final calendars = await deviceCalendarPlugin.retrieveCalendars();
+    final defaultCalendar =
+        (calendars.data ?? []).firstWhere((calendar) => calendar.isDefault!);
+    final event = Event(
+      eventId: todo.eventId,
+      defaultCalendar.id,
+      title: todo.title,
+      description: todo.description,
+      start: todo.dueDate!.toTZDateTime(),
+      end: todo.dueDate!.add(const Duration(hours: 1)).toTZDateTime(),
+    );
+    final result = await deviceCalendarPlugin.createOrUpdateEvent(event);
+    return Future.value(result?.data);
+  }
+
+  // remove due date from device calendar
+  Future<void> removeFromCalendar(Todo todo) async {
+    if (todo.dueDate == null) {
+      return;
+    }
+    final calendars = await deviceCalendarPlugin.retrieveCalendars();
+    final defaultCalendar =
+        (calendars.data ?? []).firstWhere((calendar) => calendar.isDefault!);
+
+    await deviceCalendarPlugin.deleteEvent(defaultCalendar.id, todo.eventId);
   }
 }

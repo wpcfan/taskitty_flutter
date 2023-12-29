@@ -1,4 +1,6 @@
-class Todo {
+import 'package:equatable/equatable.dart';
+
+class Todo extends Equatable {
   final String? id;
   final String? title;
   final String? description;
@@ -7,6 +9,7 @@ class Todo {
   final DateTime? dueDate;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? eventId;
 
   Todo({
     this.id,
@@ -17,8 +20,22 @@ class Todo {
     this.dueDate,
     DateTime? createdAt,
     DateTime? updatedAt,
+    this.eventId,
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
+
+  @override
+  List<Object?> get props => [
+        id,
+        title,
+        description,
+        tags,
+        completed,
+        dueDate,
+        createdAt,
+        updatedAt,
+        eventId,
+      ];
 
   Todo copyWith({
     String? id,
@@ -29,6 +46,7 @@ class Todo {
     DateTime? dueDate,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? eventId,
   }) {
     return Todo(
       id: id ?? this.id,
@@ -39,6 +57,7 @@ class Todo {
       completed: completed ?? this.completed,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      eventId: eventId ?? this.eventId,
     );
   }
 
@@ -52,6 +71,7 @@ class Todo {
       dueDate: data['dueDate']?.toDate(),
       createdAt: data['createdAt']?.toDate(),
       updatedAt: data['updatedAt']?.toDate(),
+      eventId: data['eventId'],
     );
   }
 
@@ -64,11 +84,12 @@ class Todo {
       'dueDate': dueDate,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
+      'eventId': eventId,
     };
   }
 
   @override
   String toString() {
-    return 'Todo { id: $id, title: $title, description: $description, tags: $tags, completed: $completed, dueDate: $dueDate, createdAt: $createdAt, updatedAt: $updatedAt }';
+    return 'Todo { id: $id, title: $title, description: $description, tags: $tags, completed: $completed, dueDate: $dueDate, createdAt: $createdAt, updatedAt: $updatedAt, eventId: $eventId }';
   }
 }
