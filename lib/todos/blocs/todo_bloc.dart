@@ -26,13 +26,18 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     on<SelectDay>((event, emit) => _mapSelectDayToState(event, emit));
   }
 
-  void _mapToggleTodoToState(ToggleTodo event, Emitter<TodoState> emit) async {
+  void _mapToggleTodoToState(
+    ToggleTodo event,
+    Emitter<TodoState> emit,
+  ) async {
     final updatedTodo = event.todo.copyWith(completed: !event.todo.completed);
     await _mapUpdateTodoToState(UpdateTodo(updatedTodo), emit);
   }
 
   Future<void> _mapLoadTodosToState(
-      LoadTodos event, Emitter<TodoState> emit) async {
+    LoadTodos event,
+    Emitter<TodoState> emit,
+  ) async {
     emit(state.copyWith(loading: true));
     try {
       final topTags = await getTopTags();
@@ -70,7 +75,9 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   }
 
   Future<void> _mapAddTodoToState(
-      AddTodo event, Emitter<TodoState> emit) async {
+    AddTodo event,
+    Emitter<TodoState> emit,
+  ) async {
     try {
       // get user todos
       final todos = await firestore
@@ -92,7 +99,10 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     }
   }
 
-  Future<void> updateTagCounts(List<String> tags) async {
+  Future<void> updateTagCounts(
+    List<String> tags, {
+    bool decrement = false,
+  }) async {
     // 更新标签计数
     final tagsRef = firestore.collection(collectionTags);
 
@@ -103,7 +113,12 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       await firestore.runTransaction((transaction) async {
         final tagDoc = await transaction.get(tagRef);
         if (tagDoc.exists) {
-          final count = tagDoc.data()!['count'] + 1;
+          int count = tagDoc.data()!['count'];
+          if (decrement) {
+            count -= 1;
+          } else {
+            count += 1;
+          }
           transaction.update(tagRef, {'count': count});
         } else {
           transaction.set(tagRef, {'count': 1});
@@ -112,7 +127,9 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     }
   }
 
-  Future<List<String>> getTopTags({int limit = 10}) async {
+  Future<List<String>> getTopTags({
+    int limit = 10,
+  }) async {
     // 获取所有标签，并按计数排序
     final tagsRef = firestore.collection(collectionTags);
     final sortedTags =
@@ -123,7 +140,9 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   }
 
   Future<void> _mapUpdateTodoToState(
-      UpdateTodo event, Emitter<TodoState> emit) async {
+    UpdateTodo event,
+    Emitter<TodoState> emit,
+  ) async {
     try {
       // update remote todo
       await firestore
@@ -156,16 +175,23 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   }
 
   Future<void> _mapDeleteTodoToState(
-      DeleteTodo event, Emitter<TodoState> emit) async {
+    DeleteTodo event,
+    Emitter<TodoState> emit,
+  ) async {
     try {
       // update tag counts
       await firestore
           .collection(collectionTodos)
           .doc(auth.currentUser!.uid)
           .update(<String, dynamic>{event.id: FieldValue.delete()});
+      final tags =
+          state.todos.firstWhere((todo) => todo.id == event.id).tags ?? [];
       // decrease tag counts
+      await updateTagCounts(tags, decrement: true);
+
       final updatedTodos =
           state.todos.where((todo) => todo.id != event.id).toList();
+
       // order todos by updatedAt
       final updatedFilteredTodos =
           state.filteredTodos.where((todo) => todo.id != event.id).toList();
@@ -180,11 +206,17 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     }
   }
 
-  void _mapClearErrorToState(ClearError event, Emitter<TodoState> emit) {
+  void _mapClearErrorToState(
+    ClearError event,
+    Emitter<TodoState> emit,
+  ) {
     emit(state.copyWith(error: ''));
   }
 
-  void _mapSearchTodosToState(SearchTodos event, Emitter<TodoState> emit) {
+  void _mapSearchTodosToState(
+    SearchTodos event,
+    Emitter<TodoState> emit,
+  ) {
     if (event.query.isEmpty) {
       emit(state.copyWith(filteredTodos: state.todos));
       return;
@@ -201,7 +233,10 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     emit(state.copyWith(filteredTodos: searchedTodos));
   }
 
-  void _mapSelectDayToState(SelectDay event, Emitter<TodoState> emit) {
+  void _mapSelectDayToState(
+    SelectDay event,
+    Emitter<TodoState> emit,
+  ) {
     emit(state.copyWith(selectedDate: event.selectedDay));
   }
 

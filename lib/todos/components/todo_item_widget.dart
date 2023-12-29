@@ -86,18 +86,18 @@ class TodoItemWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
     );
 
-    final rowWithBorder = Container(
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey,
-            width: 1,
+    final rowWithBorder = row
+        .padding(
+          all: 10,
+        )
+        .decorated(
+          border: const Border(
+            bottom: BorderSide(
+              color: Colors.grey,
+              width: 1,
+            ),
           ),
-        ),
-      ),
-      padding: const EdgeInsets.all(10),
-      child: row,
-    );
+        );
 
     final editAction = SlidableAction(
       onPressed: (context) {
