@@ -23,19 +23,43 @@ class TodoListWidget extends StatelessWidget {
 
     // Group todos by weekday
     for (var todo in todos) {
-      String weekday = todo.dueDate!.weekday.toString();
-      if (!groupedTodos.containsKey(weekday)) {
-        groupedTodos[weekday] = [];
+      if (todo.dueDate == null) {
+        continue;
       }
-      groupedTodos[weekday]!.add(todo);
+
+      DateTime now = DateTime.now();
+      DateTime dueDate = todo.dueDate!;
+      int differenceInDays = dueDate.difference(now).inDays;
+
+      if (differenceInDays < 0) {
+        // Overdue group
+        if (!groupedTodos.containsKey('Overdue')) {
+          groupedTodos['Overdue'] = [];
+        }
+        groupedTodos['Overdue']!.add(todo);
+      } else if (differenceInDays >= 7) {
+        // Future group
+        if (!groupedTodos.containsKey('Future')) {
+          groupedTodos['Future'] = [];
+        }
+        groupedTodos['Future']!.add(todo);
+      } else {
+        // Group by weekday
+        String weekday = dueDate.weekday.toString();
+        if (!groupedTodos.containsKey(weekday)) {
+          groupedTodos[weekday] = [];
+        }
+        groupedTodos[weekday]!.add(todo);
+      }
     }
 
     return SliverList.builder(
       key: key,
       itemCount: groupedTodos.length,
       itemBuilder: (context, index) {
-        final weekday = groupedTodos.keys.toList()[index];
-        final todosForWeekday = groupedTodos[weekday]!;
+        final keys = groupedTodos.keys.toList();
+        final group = keys[index];
+        final todosForGroup = groupedTodos[group]!;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,7 +67,7 @@ class TodoListWidget extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                _getWeekdayName(int.parse(weekday)),
+                _getGroupName(group),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -53,9 +77,9 @@ class TodoListWidget extends StatelessWidget {
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: todosForWeekday.length,
+              itemCount: todosForGroup.length,
               itemBuilder: (context, index) {
-                final todo = todosForWeekday[index];
+                final todo = todosForGroup[index];
                 return TodoItemWidget(
                   key: Key('__todo_item_${todo.id}__'),
                   todo: todo,
@@ -71,22 +95,26 @@ class TodoListWidget extends StatelessWidget {
     );
   }
 
-  String _getWeekdayName(int weekday) {
-    switch (weekday) {
-      case 1:
+  String _getGroupName(String group) {
+    switch (group) {
+      case '1':
         return 'Monday';
-      case 2:
+      case '2':
         return 'Tuesday';
-      case 3:
+      case '3':
         return 'Wednesday';
-      case 4:
+      case '4':
         return 'Thursday';
-      case 5:
+      case '5':
         return 'Friday';
-      case 6:
+      case '6':
         return 'Saturday';
-      case 7:
+      case '7':
         return 'Sunday';
+      case 'Overdue':
+        return 'Overdue';
+      case 'Future':
+        return 'Future';
       default:
         return '';
     }
