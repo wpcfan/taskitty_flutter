@@ -14,6 +14,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:relative_time/relative_time.dart';
+import 'package:taskitty_flutter/constants.dart';
 
 import 'auth/auth.dart';
 import 'common/common.dart';
@@ -37,7 +38,9 @@ Future<void> main() async {
   };
 
   /// 初始化 Bloc 的观察者，用于监听 Bloc 的生命周期
-  Bloc.observer = SimpleBlocObserver();
+  if (isDevelopment) {
+    Bloc.observer = SimpleBlocObserver();
+  }
   // Ideal time to initialize
   // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 

@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:taskitty_flutter/common/common.dart';
 
 import '../blocs/blocs.dart';
@@ -78,12 +77,8 @@ class TodoListPage extends StatelessWidget {
       },
     );
 
-    final calendar = TableCalendar(
-      firstDay: DateTime.utc(2010, 10, 16),
-      lastDay: DateTime.utc(2030, 3, 14),
-      focusedDay: DateTime.now(),
-      calendarFormat: CalendarFormat.week,
-      onDaySelected: (selectedDay, focusedDay) {
+    final calendar = TableCalendarWidget(
+      onDaySelected: (selectedDay) {
         bloc.add(SelectDay(selectedDay));
       },
       eventLoader: (day) {
