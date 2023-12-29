@@ -39,5 +39,6 @@
   "confirmDeleteContent": "您确定要删除这个待办事项吗？",
   "topTagsHintText": "您也许对以下标签感兴趣",
   "tagsHintText": "请输入标签...",
-  "duplicateTagError": "标签已存在"
+  "duplicateTagError": "标签已存在",
+  "slidableActionDelete": "删除"
 }

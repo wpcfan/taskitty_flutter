@@ -93,13 +93,13 @@ class _TagsWidgetState extends State<TagsWidget> {
           runSpacing: 5.0,
         );
     return [
-      tagInput.expanded(),
       if (widget.topTags.isNotEmpty)
         Text(
           AppLocalizations.of(context)!.topTagsHintText,
           style: widget.topTagsHintTextStyle,
         ).expanded(),
       if (widget.topTags.isNotEmpty) topTagsList.expanded(),
+      tagInput.expanded(),
     ].toColumn(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,

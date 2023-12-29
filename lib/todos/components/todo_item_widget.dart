@@ -11,8 +11,6 @@ class TodoItemWidget extends StatelessWidget {
   final Function(Todo)? onToggle;
   final Function(Todo)? onEdit;
   final Function(Todo)? onDelete;
-  final String editText;
-  final String deleteText;
 
   const TodoItemWidget({
     super.key,
@@ -20,8 +18,6 @@ class TodoItemWidget extends StatelessWidget {
     this.onToggle,
     this.onEdit,
     this.onDelete,
-    this.editText = 'Edit',
-    this.deleteText = 'Delete',
   });
 
   @override
@@ -97,16 +93,13 @@ class TodoItemWidget extends StatelessWidget {
               width: 1,
             ),
           ),
-        );
-
-    final editAction = SlidableAction(
-      onPressed: (context) {
+        )
+        .inkWell(
+      onTap: () {
         if (onEdit != null) {
           onEdit!(todo);
         }
       },
-      label: editText,
-      backgroundColor: Colors.blue,
     );
 
     final deleteAction = SlidableAction(
@@ -129,14 +122,13 @@ class TodoItemWidget extends StatelessWidget {
           );
         }
       },
-      label: deleteText,
+      label: AppLocalizations.of(context)!.slidableActionDelete,
       backgroundColor: Colors.red,
     );
 
     final endActionPane = ActionPane(
       motion: const ScrollMotion(),
       children: [
-        editAction,
         deleteAction,
       ],
     );

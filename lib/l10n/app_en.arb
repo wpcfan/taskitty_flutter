@@ -162,5 +162,9 @@
   "duplicateTagError": "Tag already exists",
   "@duplicateTagError": {
     "description": "The error message when the tag already exists"
+  },
+  "slidableActionDelete": "Delete",
+  "@slidableActionDelete": {
+    "description": "The label for the delete action"
   }
 }
