@@ -1,4 +1,6 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:taskitty_flutter/common/extensions/extensions.dart';
 
 import '../models/models.dart';
 import 'todo_item_widget.dart';
@@ -19,39 +21,43 @@ class TodoListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, List<Todo>> groupedTodos = {};
-
-    // Group todos by weekday
-    for (var todo in todos) {
+    todos.sort((a, b) {
+      if (a.completed) {
+        return 1;
+      } else if (b.completed) {
+        return -1;
+      } else {
+        return a.dueDate!.compareTo(b.dueDate!);
+      }
+    });
+    Map<String, List<Todo>> groupedTodos = groupBy(todos, (todo) {
       if (todo.dueDate == null) {
-        continue;
+        return 'No Due Date';
       }
 
       DateTime now = DateTime.now();
       DateTime dueDate = todo.dueDate!;
       int differenceInDays = dueDate.difference(now).inDays;
-
-      if (differenceInDays < 0) {
-        // Overdue group
-        if (!groupedTodos.containsKey('Overdue')) {
-          groupedTodos['Overdue'] = [];
-        }
-        groupedTodos['Overdue']!.add(todo);
+      if (todo.completed) {
+        return 'Completed';
+      } else if (differenceInDays < 0) {
+        return 'Overdue';
       } else if (differenceInDays >= 7) {
-        // Future group
-        if (!groupedTodos.containsKey('Future')) {
-          groupedTodos['Future'] = [];
-        }
-        groupedTodos['Future']!.add(todo);
+        return 'Future';
       } else {
-        // Group by weekday
-        String weekday = dueDate.weekday.toString();
-        if (!groupedTodos.containsKey(weekday)) {
-          groupedTodos[weekday] = [];
+        if (dueDate.day == now.day &&
+            dueDate.month == now.month &&
+            dueDate.year == now.year) {
+          return 'Today';
+        } else if (dueDate.day == now.add(const Duration(days: 1)).day &&
+            dueDate.month == now.add(const Duration(days: 1)).month &&
+            dueDate.year == now.add(const Duration(days: 1)).year) {
+          return 'Tomorrow';
+        } else {
+          return dueDate.formatted;
         }
-        groupedTodos[weekday]!.add(todo);
       }
-    }
+    });
 
     return SliverList.builder(
       key: key,
@@ -61,62 +67,33 @@ class TodoListWidget extends StatelessWidget {
         final group = keys[index];
         final todosForGroup = groupedTodos[group]!;
 
-        return Column(
+        return [
+          Text(
+            group,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ).padding(all: 8.0),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: todosForGroup.length,
+            itemBuilder: (context, index) {
+              final todo = todosForGroup[index];
+              return TodoItemWidget(
+                key: Key('__todo_item_${todo.id}__'),
+                todo: todo,
+                onToggle: onToggle,
+                onEdit: onEdit,
+                onDelete: onDelete,
+              );
+            },
+          ),
+        ].toColumn(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                _getGroupName(group),
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: todosForGroup.length,
-              itemBuilder: (context, index) {
-                final todo = todosForGroup[index];
-                return TodoItemWidget(
-                  key: Key('__todo_item_${todo.id}__'),
-                  todo: todo,
-                  onToggle: onToggle,
-                  onEdit: onEdit,
-                  onDelete: onDelete,
-                );
-              },
-            ),
-          ],
         );
       },
     );
-  }
-
-  String _getGroupName(String group) {
-    switch (group) {
-      case '1':
-        return 'Monday';
-      case '2':
-        return 'Tuesday';
-      case '3':
-        return 'Wednesday';
-      case '4':
-        return 'Thursday';
-      case '5':
-        return 'Friday';
-      case '6':
-        return 'Saturday';
-      case '7':
-        return 'Sunday';
-      case 'Overdue':
-        return 'Overdue';
-      case 'Future':
-        return 'Future';
-      default:
-        return '';
-    }
   }
 }
