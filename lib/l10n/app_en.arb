@@ -166,5 +166,73 @@
   "slidableActionDelete": "Delete",
   "@slidableActionDelete": {
     "description": "The label for the delete action"
+  },
+  "searchPlaceholder": "Search",
+  "@searchPlaceholder": {
+    "description": "The placeholder for the search input"
+  },
+  "dueDateHint": "Enter the due date",
+  "@dueDateHint": {
+    "description": "The hint for the due date input"
+  },
+  "tableCalendarWeek": "Week",
+  "@tableCalendarWeek": {
+    "description": "The label for the week tab"
+  },
+  "tableCalendarMonth": "Month",
+  "@tableCalendarMonth": {
+    "description": "The label for the month tab"
+  },
+  "todoListNoDueDate": "No due date",
+  "@todoListNoDueDate": {
+    "description": "The label for the no due date todo"
+  },
+  "todoListCompleted": "Completed",
+  "@todoListCompleted": {
+    "description": "The label for the completed todo"
+  },
+  "todoListOverdue": "Overdue",
+  "@todoListOverdue": {
+    "description": "The label for the overdue todo"
+  },
+  "todoListMoreThanWeek": "Future",
+  "@todoListMoreThanWeek": {
+    "description": "The label for the future todo"
+  },
+  "todoListToday": "Today",
+  "@todoListToday": {
+    "description": "The label for the today todo"
+  },
+  "todoListTomorrow": "Tomorrow",
+  "@todoListTomorrow": {
+    "description": "The label for the tomorrow todo"
+  },
+  "popupUpdating": "Updating...",
+  "@popupUpdating": {
+    "description": "The label for the updating popup"
+  },
+  "confirmDialogCancel": "Cancel",
+  "@confirmDialogCancel": {
+    "description": "The label for the cancel button"
+  },
+  "confirmDialogConfirm": "Confirm",
+  "@confirmDialogConfirm": {
+    "description": "The label for the confirm button"
+  },
+  "ptrInactive": "Pull to refresh",
+  "@ptrInactive": {
+    "description": "The label for the pull to refresh"
+  },
+  "ptrPullToRefresh": "Pull to refresh",
+  "@ptrPullToRefresh": {
+    "description": "The label for the pull to refresh"
+  },
+  "ptrReleaseToRefresh": "Release to refresh",
+  "@ptrReleaseToRefresh": {
+    "description": "The label for the release to refresh"
+  },
+  "ptrRefreshComplete": "Refresh complete",
+  "@ptrRefreshComplete": {
+    "description": "The label for the refresh complete"
   }
 }

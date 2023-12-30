@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ConfirmDialog extends StatelessWidget {
   final String title;
   final String content;
-  final String confirmText;
-  final String cancelText;
   final Function(bool)? onClose;
 
   const ConfirmDialog({
     super.key,
     required this.title,
     required this.content,
-    this.confirmText = '确定',
-    this.cancelText = '取消',
     this.onClose,
   });
 
@@ -27,14 +24,14 @@ class ConfirmDialog extends StatelessWidget {
             Navigator.of(context).pop(false);
             onClose?.call(false);
           },
-          child: Text(cancelText),
+          child: Text(AppLocalizations.of(context)!.confirmDialogCancel),
         ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop(true);
             onClose?.call(true);
           },
-          child: Text(confirmText),
+          child: Text(AppLocalizations.of(context)!.confirmDialogConfirm),
         ),
       ],
     );

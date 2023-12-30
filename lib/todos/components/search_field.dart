@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// 顶部导航栏的标题位置组件
@@ -7,7 +8,6 @@ class SearchFieldWidget extends StatefulWidget {
   final Function(String)? onSubmitted;
   final Function(String)? onChanged;
   final int debounceTime;
-  final String placeholder;
   final TextStyle placeholderStyle;
   final Icon prefixIcon;
   final Color backgroundColor;
@@ -17,7 +17,6 @@ class SearchFieldWidget extends StatefulWidget {
     this.onSubmitted,
     this.onChanged,
     this.debounceTime = 300,
-    this.placeholder = 'Search',
     this.placeholderStyle = const TextStyle(color: Colors.white30),
     this.prefixIcon = const Icon(Icons.search, color: Colors.white),
     this.backgroundColor = Colors.black12,
@@ -54,7 +53,7 @@ class _SearchFieldWidgetState extends State<SearchFieldWidget> {
   @override
   Widget build(BuildContext context) {
     return CupertinoSearchTextField(
-      placeholder: widget.placeholder,
+      placeholder: AppLocalizations.of(context)!.searchPlaceholder,
       placeholderStyle: widget.placeholderStyle,
       prefixIcon: widget.prefixIcon,
       backgroundColor: widget.backgroundColor,

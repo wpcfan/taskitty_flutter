@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class DueDateWidget extends StatefulWidget {
@@ -6,7 +7,6 @@ class DueDateWidget extends StatefulWidget {
   final DateTime firstDate;
   final DateTime lastDate;
   final IconData calendarIcon;
-  final String hintText;
   final String dateFormat;
   final Function(String)? onDateChanged;
   final Function()? onDateNotSelected;
@@ -17,7 +17,6 @@ class DueDateWidget extends StatefulWidget {
     required this.firstDate,
     required this.lastDate,
     this.calendarIcon = Icons.calendar_today,
-    this.hintText = 'Enter Date',
     this.dateFormat = 'yyyy-MM-dd',
     this.onDateChanged,
     this.onDateNotSelected,
@@ -48,7 +47,7 @@ class _DueDateWidgetState extends State<DueDateWidget> {
       controller: dateController,
       decoration: InputDecoration(
         icon: Icon(widget.calendarIcon),
-        labelText: widget.hintText,
+        labelText: AppLocalizations.of(context)!.dueDateHint,
       ),
       readOnly: true,
       onTap: () async {

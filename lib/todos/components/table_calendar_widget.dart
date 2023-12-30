@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class TableCalendarWidget extends StatefulWidget {
@@ -39,9 +40,9 @@ class _TableCalendarWidgetState extends State<TableCalendarWidget> {
       lastDay: widget.lastDay,
       focusedDay: _focusedDay,
       calendarFormat: _calendarFormat,
-      availableCalendarFormats: const {
-        CalendarFormat.week: 'Week',
-        CalendarFormat.month: 'Month',
+      availableCalendarFormats: {
+        CalendarFormat.week: AppLocalizations.of(context)!.tableCalendarWeek,
+        CalendarFormat.month: AppLocalizations.of(context)!.tableCalendarMonth,
       },
       onFormatChanged: (format) {
         setState(() {

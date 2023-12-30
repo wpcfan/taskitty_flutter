@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:taskitty_flutter/common/extensions/extensions.dart';
 
 import '../models/models.dart';
@@ -32,27 +33,27 @@ class TodoListWidget extends StatelessWidget {
     });
     Map<String, List<Todo>> groupedTodos = groupBy(todos, (todo) {
       if (todo.dueDate == null) {
-        return 'No Due Date';
+        return AppLocalizations.of(context)!.todoListNoDueDate;
       }
 
       DateTime now = DateTime.now();
       DateTime dueDate = todo.dueDate!;
       int differenceInDays = dueDate.difference(now).inDays;
       if (todo.completed) {
-        return 'Completed';
+        return AppLocalizations.of(context)!.todoListCompleted;
       } else if (differenceInDays < 0) {
-        return 'Overdue';
+        return AppLocalizations.of(context)!.todoListOverdue;
       } else if (differenceInDays >= 7) {
-        return 'Future';
+        return AppLocalizations.of(context)!.todoListMoreThanWeek;
       } else {
         if (dueDate.day == now.day &&
             dueDate.month == now.month &&
             dueDate.year == now.year) {
-          return 'Today';
+          return AppLocalizations.of(context)!.todoListToday;
         } else if (dueDate.day == now.add(const Duration(days: 1)).day &&
             dueDate.month == now.add(const Duration(days: 1)).month &&
             dueDate.year == now.add(const Duration(days: 1)).year) {
-          return 'Tomorrow';
+          return AppLocalizations.of(context)!.todoListTomorrow;
         } else {
           return dueDate.formatted;
         }

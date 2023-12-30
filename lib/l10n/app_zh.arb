@@ -40,5 +40,22 @@
   "topTagsHintText": "您也许对以下标签感兴趣",
   "tagsHintText": "请输入标签...",
   "duplicateTagError": "标签已存在",
-  "slidableActionDelete": "删除"
+  "slidableActionDelete": "删除",
+  "searchPlaceholder": "搜索",
+  "dueDateHint": "请输入截止日期",
+  "tableCalendarWeek": "周",
+  "tableCalendarMonth": "月",
+  "todoListNoDueDate": "无截止日期",
+  "todoListCompleted": "已完成",
+  "todoListOverdue": "已过期",
+  "todoListMoreThanWeek": "一周后",
+  "todoListToday": "今天",
+  "todoListTomorrow": "明天",
+  "popupUpdating": "更新中...",
+  "confirmDialogCancel": "取消",
+  "confirmDialogConfirm": "确认",
+  "ptrInactive": "下拉刷新",
+  "ptrPullToRefresh": "下拉刷新",
+  "ptrReleaseToRefresh": "松开刷新",
+  "ptrRefreshComplete": "刷新完成"
 }

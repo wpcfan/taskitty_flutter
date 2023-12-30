@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:taskitty_flutter/common/common.dart';
 
 import '../blocs/blocs.dart';
@@ -59,7 +60,7 @@ class TodoListPage extends StatelessWidget {
     }
 
     if (state.updating) {
-      EasyLoading.show(status: 'Updating...');
+      EasyLoading.show(status: AppLocalizations.of(context)!.popupUpdating);
     } else {
       EasyLoading.dismiss();
     }
@@ -132,6 +133,18 @@ class TodoListPage extends StatelessWidget {
           bloc.add(const LoadTodos());
           await bloc.stream.firstWhere((state) => !state.loading);
         },
+        inactiveWidget: Center(
+          child: Text(AppLocalizations.of(context)!.ptrInactive),
+        ),
+        pullToRefreshWidget: Center(
+          child: Text(AppLocalizations.of(context)!.ptrPullToRefresh),
+        ),
+        releaseToRefreshWidget: Center(
+          child: Text(AppLocalizations.of(context)!.ptrReleaseToRefresh),
+        ),
+        refreshCompleteWidget: Center(
+          child: Text(AppLocalizations.of(context)!.ptrRefreshComplete),
+        ),
       ),
     );
   }
