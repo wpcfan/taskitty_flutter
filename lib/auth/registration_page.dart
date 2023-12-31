@@ -77,7 +77,7 @@ class RegistrationPage extends StatelessWidget {
         formKey.currentState!.save();
         if (formKey.currentState!.validate()) {
           // Get the instance of RegisterBloc
-          final registerBloc = BlocProvider.of<RegisterBloc>(context);
+          final registerBloc = context.read<RegisterBloc>();
           // Add RegisterStarted event
           registerBloc.add(RegisterStarted(
             email: emailController.text,

@@ -71,10 +71,10 @@ class TodoListPage extends StatelessWidget {
     final todoList = TodoListWidget(
       todos: state.filteredTodos,
       onToggle: (todo) {
-        context.read<TodoBloc>().add(ToggleTodo(todo));
+        bloc.add(ToggleTodo(todo));
       },
       onDelete: (todo) {
-        context.read<TodoBloc>().add(DeleteTodo(todo.id ?? ''));
+        bloc.add(DeleteTodo(todo.id ?? ''));
       },
     );
 

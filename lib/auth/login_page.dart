@@ -102,7 +102,7 @@ class LoginPage extends StatelessWidget {
         formKey.currentState!.save();
         if (formKey.currentState!.validate()) {
           // Get the instance of LoginBloc
-          final loginBloc = BlocProvider.of<LoginBloc>(context);
+          final loginBloc = context.read<LoginBloc>();
           // Add LoginStarted event
           loginBloc.add(LoginStarted(
             email: emailController.text,
