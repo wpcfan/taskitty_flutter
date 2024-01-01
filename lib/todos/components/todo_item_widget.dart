@@ -83,17 +83,14 @@ class TodoItemWidget extends StatelessWidget {
     );
 
     final rowWithBorder = row
-        .padding(
-          all: 10,
-        )
         .decorated(
-          border: const Border(
-            bottom: BorderSide(
-              color: Colors.grey,
-              width: 1,
-            ),
-          ),
-        )
+      border: const Border(
+        bottom: BorderSide(
+          color: Colors.grey,
+          width: 1,
+        ),
+      ),
+    )
         .inkWell(
       onTap: () {
         if (onEdit != null) {

@@ -68,14 +68,16 @@ class _AddTodoPageState extends State<AddTodoPage> {
   }
 
   Widget buildTags(List<String> topTags) {
+    onTagChanged(tags) {
+      setState(() {
+        _tags = tags;
+      });
+      debugPrint('Tags changed: $tags');
+    }
+
     return TagsWidget(
       topTags: topTags,
-      onTagChanged: (tags) {
-        setState(() {
-          _tags = tags;
-        });
-        debugPrint('Tags changed: $tags');
-      },
+      onTagChanged: onTagChanged,
     );
   }
 
@@ -87,24 +89,28 @@ class _AddTodoPageState extends State<AddTodoPage> {
 
   Widget buildDueDate() {
     final now = DateTime.now();
+    onDateChanged(date) {
+      setState(() {
+        _dueDate = DateTime.parse(date);
+      });
+    }
+
+    onDateNotSelected() {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.addTodoErrorDueDateNotSelected,
+          ),
+        ),
+      );
+    }
+
     return DueDateWidget(
       initialDate: now,
       firstDate: now.subtract(const Duration(days: 365)),
       lastDate: now.add(const Duration(days: 365)),
-      onDateChanged: (date) {
-        setState(() {
-          _dueDate = DateTime.parse(date);
-        });
-      },
-      onDateNotSelected: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.addTodoErrorDueDateNotSelected,
-            ),
-          ),
-        );
-      },
+      onDateChanged: onDateChanged,
+      onDateNotSelected: onDateNotSelected,
     );
   }
 
@@ -119,43 +125,46 @@ class _AddTodoPageState extends State<AddTodoPage> {
   }
 
   ElevatedButton buildConfirm(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        if (_textEditingController.text.trim().isNotEmpty) {
-          setState(() {
-            final todo = Todo(
-              id: const Uuid().v4(),
-              title: _textEditingController.text.trim(),
-              tags: _tags,
-              dueDate: _dueDate,
-            );
-            _textEditingController.clear();
-            Navigator.pop(context, todo);
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                  Text(AppLocalizations.of(context)!.addTodoErrorTextIsEmpty),
-            ),
+    onPressedConfirm() {
+      if (_textEditingController.text.trim().isNotEmpty) {
+        setState(() {
+          final todo = Todo(
+            id: const Uuid().v4(),
+            title: _textEditingController.text.trim(),
+            tags: _tags,
+            dueDate: _dueDate,
           );
-        }
-      },
+          _textEditingController.clear();
+          Navigator.pop(context, todo);
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text(AppLocalizations.of(context)!.addTodoErrorTextIsEmpty),
+          ),
+        );
+      }
+    }
+
+    return ElevatedButton(
+      onPressed: onPressedConfirm,
       child: Text(AppLocalizations.of(context)!.addTodoButtonText),
     );
   }
 
   Widget buildInput(BuildContext context) {
+    var iconButton = IconButton(
+      icon: const Icon(Icons.clear),
+      onPressed: () {
+        _textEditingController.clear();
+      },
+    );
     return TextField(
       controller: _textEditingController,
       decoration: InputDecoration(
         hintText: AppLocalizations.of(context)!.addTodoHintText,
-        suffixIcon: IconButton(
-          icon: const Icon(Icons.clear),
-          onPressed: () {
-            _textEditingController.clear();
-          },
-        ),
+        suffixIcon: iconButton,
       ),
     );
   }

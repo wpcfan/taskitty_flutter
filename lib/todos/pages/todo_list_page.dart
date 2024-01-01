@@ -109,8 +109,7 @@ class TodoListPage extends StatelessWidget {
               child: CircularProgressIndicator(),
             ),
           )
-        : [calendar.toSliver().sliverPadding(all: 10), todoList]
-            .toMultiSliver();
+        : [calendar.toSliver(), todoList].toMultiSliver();
     return Scaffold(
       body: MyCustomScrollView(
         decoration: decoration,
