@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -36,6 +38,20 @@ class _TableCalendarWidgetState extends State<TableCalendarWidget> {
   @override
   Widget build(BuildContext context) {
     return TableCalendar(
+      locale: Platform.localeName,
+      daysOfWeekHeight: 20,
+      daysOfWeekStyle: DaysOfWeekStyle(
+        weekdayStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+        weekendStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+      headerStyle: const HeaderStyle(
+        titleCentered: true,
+        formatButtonVisible: true,
+      ),
       firstDay: widget.firstDay,
       lastDay: widget.lastDay,
       focusedDay: _focusedDay,

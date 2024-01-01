@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:device_calendar/device_calendar.dart';
 import 'package:intl/intl.dart';
 
@@ -7,6 +9,6 @@ extension DateTimeExtensions on DateTime {
   }
 
   String get formatted {
-    return DateFormat.yMMMEd().format(this);
+    return DateFormat.yMMMEd(Platform.localeName).format(this);
   }
 }
