@@ -22,7 +22,8 @@ class TodoListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    todos.sort((a, b) {
+    List<Todo> sortedTodos = todos.toList();
+    sortedTodos.sort((a, b) {
       if (a.completed) {
         return 1;
       } else if (b.completed) {
@@ -31,7 +32,7 @@ class TodoListWidget extends StatelessWidget {
         return a.dueDate!.compareTo(b.dueDate!);
       }
     });
-    Map<String, List<Todo>> groupedTodos = groupBy(todos, (todo) {
+    Map<String, List<Todo>> groupedTodos = groupBy(sortedTodos, (todo) {
       if (todo.dueDate == null) {
         return AppLocalizations.of(context)!.todoListNoDueDate;
       }
@@ -75,8 +76,9 @@ class TodoListWidget extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
-          ).padding(all: 8.0),
+          ).padding(top: 10),
           ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 10),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: todosForGroup.length,
@@ -91,9 +93,12 @@ class TodoListWidget extends StatelessWidget {
               );
             },
           ),
-        ].toColumn(
-          crossAxisAlignment: CrossAxisAlignment.start,
-        );
+        ]
+            .toColumn(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+            )
+            .padding(horizontal: 10);
       },
     );
   }
