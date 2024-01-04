@@ -51,9 +51,7 @@ class TodoListPage extends StatelessWidget {
   void listenStateChanges(context, state) {
     if (state.error.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(state.error),
-        ),
+        SnackBar(content: Text(state.error)),
       );
 
       context.read<TodoBloc>().add(const ClearError());
@@ -81,6 +79,14 @@ class TodoListPage extends StatelessWidget {
     final calendar = TableCalendarWidget(
       onDaySelected: (selectedDay) {
         bloc.add(SelectDay(selectedDay));
+        Navigator.of(context).pushNamed('/select_day', arguments: {
+          'selectedDate': selectedDay,
+          'todos': state.todos.where((todo) {
+            return todo.dueDate?.day == selectedDay.day &&
+                todo.dueDate?.month == selectedDay.month &&
+                todo.dueDate?.year == selectedDay.year;
+          }).toList(),
+        });
       },
       eventLoader: (day) {
         final todos = state.todos.where((todo) {

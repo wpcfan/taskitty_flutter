@@ -58,6 +58,8 @@ dependencies:
   device_calendar: ^4.3.2
   flutter_easyloading: any
   collection: any
+  scrollable_positioned_list: any
+  time_planner: any
 
 dev_dependencies:
   flutter_test:

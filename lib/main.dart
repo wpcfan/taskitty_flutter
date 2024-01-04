@@ -99,6 +99,9 @@ class MyApp extends StatelessWidget {
         '/add_todo': (context) => AddTodoPage(
               analytics: analytics,
             ),
+        '/select_day': (context) => SelectDayPage(
+              analytics: analytics,
+            ),
       },
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
