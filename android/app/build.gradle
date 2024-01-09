@@ -34,6 +34,8 @@ android {
     ndkVersion flutter.ndkVersion
 
     compileOptions {
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -53,9 +55,10 @@ android {
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 21
         targetSdkVersion 34
-        compileSdkVersion 34
+        compileSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -83,4 +86,13 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
+    // There have been reports that enabling desugaring may 
+    // result in a Flutter apps crashing on Android 12L and above. 
+    // This would be an issue with Flutter itself, not the plugin. 
+    // One possible fix is adding the
+    implementation "androidx.window:window:1.0.0"
+    // For Java-friendly APIs to register and unregister callbacks
+    implementation "androidx.window:window-java:1.0.0"
+}
