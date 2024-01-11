@@ -1,29 +1,37 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_calendar/device_calendar.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:relative_time/relative_time.dart';
 import 'package:taskitty_flutter/constants.dart';
+import 'package:taskitty_flutter/local_notification_wrapper.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
-import 'auth/auth.dart';
+import 'blocs/blocs.dart';
 import 'common/common.dart';
 import 'firebase_options.dart';
-import 'home/home.dart';
-import 'todos/todos.dart';
+
+Future<void> _configureLocalTimeZone() async {
+  if (kIsWeb || Platform.isLinux) {
+    return;
+  }
+  tz.initializeTimeZones();
+  final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+  tz.setLocalLocation(tz.getLocation(timeZoneName));
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await _configureLocalTimeZone();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -41,90 +49,15 @@ Future<void> main() async {
   if (isDevelopment) {
     Bloc.observer = SimpleBlocObserver();
   }
+  await initializeDateFormatting();
   // Ideal time to initialize
   // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 
-  initializeDateFormatting().then((_) => runApp(const MyApp()));
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer =
-      FirebaseAnalyticsObserver(analytics: analytics);
-  static FirebaseAuth auth = FirebaseAuth.instance;
-  static FirebaseFirestore firestore = FirebaseFirestore.instance;
-  static DeviceCalendarPlugin deviceCalendarPlugin = DeviceCalendarPlugin();
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
-      localizationsDelegates: const [
-        AppLocalizations.delegate, // Add this line
-        RelativeTimeLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: AppLocalizations.supportedLocales,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      navigatorObservers: <NavigatorObserver>[observer],
-      routes: {
-        '/login': (context) => LoginPage(
-              analytics: analytics,
-              observer: observer,
-              auth: auth,
-            ),
-        '/forgot_password': (context) => ForgotPasswordPage(
-              auth: auth,
-            ),
-        '/register': (context) => RegistrationPage(
-              auth: auth,
-            ),
-        '/home': (context) => HomePage(
-              title: 'Firebase Analytics Demo',
-              analytics: analytics,
-              observer: observer,
-            ),
-        '/todos': (context) => TodoListPage(
-              firestore: firestore,
-              auth: auth,
-              analytics: analytics,
-              deviceCalendarPlugin: deviceCalendarPlugin,
-            ),
-        '/add_todo': (context) => AddTodoPage(
-              analytics: analytics,
-            ),
-        '/select_day': (context) => SelectDayPage(
-              analytics: analytics,
-            ),
-      },
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
-          if (snapshot.hasData) {
-            return HomePage(
-              title: 'Firebase Analytics Demo',
-              analytics: analytics,
-              observer: observer,
-            );
-          } else {
-            return LoginPage(
-              analytics: analytics,
-              observer: observer,
-              auth: auth,
-            );
-          }
-        },
-      ),
-      builder: (context, child) {
-        EasyLoading.init();
-        return FlutterEasyLoading(child: child);
-      },
-    );
-  }
+  runApp(RepositoryProvider(
+    create: (context) => FlutterLocalNotificationsPlugin(),
+    child: BlocProvider(
+      create: (context) => NotificationBloc(),
+      child: const LocalNotificationWrapper(),
+    ),
+  ));
 }

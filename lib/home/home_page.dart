@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../blocs/blocs.dart';
 import 'tabs_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,11 +17,18 @@ class HomePage extends StatefulWidget {
     required this.title,
     required this.analytics,
     required this.observer,
+    this.notificationAppLaunchDetails,
+    required this.flutterLocalNotificationsPlugin,
   });
 
   final String title;
   final FirebaseAnalytics analytics;
   final FirebaseAnalyticsObserver observer;
+  final NotificationAppLaunchDetails? notificationAppLaunchDetails;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+  bool get didNotificationLaunchApp =>
+      notificationAppLaunchDetails?.didNotificationLaunchApp ?? false;
 
   @override
   State<HomePage> createState() => HomePageState();
@@ -23,6 +36,65 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   String _message = '';
+  bool _notificationsEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isAndroidPermissionGranted();
+    _requestPermissions();
+  }
+
+  Future<void> _isAndroidPermissionGranted() async {
+    if (Platform.isAndroid) {
+      final bool granted = await widget.flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin>()
+              ?.areNotificationsEnabled() ??
+          false;
+
+      setState(() {
+        _notificationsEnabled = granted;
+      });
+    }
+  }
+
+  Future<void> _requestPermissions() async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      await widget.flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+      await widget.flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              MacOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    } else if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          widget.flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin>();
+
+      final bool? grantedNotificationPermission =
+          await androidImplementation?.requestNotificationsPermission();
+      setState(() {
+        _notificationsEnabled = grantedNotificationPermission ?? false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   void setMessage(String message) {
     setState(() {
@@ -268,153 +340,186 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Column(
-        children: <Widget>[
-          MaterialButton(
-            onPressed: _sendAnalyticsEvent,
-            child: const Text('Test logEvent'),
-          ),
-          MaterialButton(
-            onPressed: _testAllEventTypes,
-            child: const Text('Test standard event types'),
-          ),
-          MaterialButton(
-            onPressed: _testSetUserId,
-            child: const Text('Test setUserId'),
-          ),
-          MaterialButton(
-            onPressed: _testSetCurrentScreen,
-            child: const Text('Test setCurrentScreen'),
-          ),
-          MaterialButton(
-            onPressed: _testSetAnalyticsCollectionEnabled,
-            child: const Text('Test setAnalyticsCollectionEnabled'),
-          ),
-          MaterialButton(
-            onPressed: _testSetSessionTimeoutDuration,
-            child: const Text('Test setSessionTimeoutDuration'),
-          ),
-          MaterialButton(
-            onPressed: _testSetUserProperty,
-            child: const Text('Test setUserProperty'),
-          ),
-          MaterialButton(
-            onPressed: _testAppInstanceId,
-            child: const Text('Test appInstanceId'),
-          ),
-          MaterialButton(
-            onPressed: _testResetAnalyticsData,
-            child: const Text('Test resetAnalyticsData'),
-          ),
-          MaterialButton(
-            onPressed: _setDefaultEventParameters,
-            child: const Text('Test setDefaultEventParameters'),
-          ),
-          Text(
-            _message,
-            style: const TextStyle(color: Color.fromARGB(255, 0, 155, 0)),
-          ),
-        ],
-      ),
-      drawer: Drawer(
-        child: ListView(
+    return BlocListener<NotificationBloc, NotificationState>(
+      listener: (context, state) {
+        if (state.notifications.isNotEmpty) {
+          final receivedNotification = state.notifications.first;
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => CupertinoAlertDialog(
+              title: receivedNotification.title != null
+                  ? Text(receivedNotification.title!)
+                  : null,
+              content: receivedNotification.body != null
+                  ? Text(receivedNotification.body!)
+                  : null,
+              actions: <Widget>[
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  onPressed: () async {
+                    Navigator.of(context, rootNavigator: true).pop();
+                    // await Navigator.of(context).push(
+                    //   MaterialPageRoute<void>(
+                    //     builder: (BuildContext context) =>
+                    //         SecondPage(receivedNotification.payload),
+                    //   ),
+                    // );
+                  },
+                  child: const Text('Ok'),
+                )
+              ],
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Column(
           children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 0, 155, 0),
-              ),
-              child: Text(
-                'Firebase Analytics',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
+            MaterialButton(
+              onPressed: _sendAnalyticsEvent,
+              child: const Text('Test logEvent'),
             ),
-            ListTile(
-              title: const Text('Todos'),
-              onTap: () {
-                Navigator.of(context).pushNamed('/todos');
-              },
+            MaterialButton(
+              onPressed: _testAllEventTypes,
+              child: const Text('Test standard event types'),
             ),
-            ListTile(
-              title: const Text('Performance'),
-              onTap: () {
-                Navigator.of(context).pushNamed('/performance');
-              },
+            MaterialButton(
+              onPressed: _testSetUserId,
+              child: const Text('Test setUserId'),
             ),
-            ListTile(
-              title: const Text('Cloud Messaging'),
-              onTap: () {
-                Navigator.of(context).pushNamed('/messaging');
-              },
+            MaterialButton(
+              onPressed: _testSetCurrentScreen,
+              child: const Text('Test setCurrentScreen'),
             ),
-            ListTile(
-              title: const Text('Authentication'),
-              onTap: () {
-                Navigator.of(context).pushNamed('/authentication');
-              },
+            MaterialButton(
+              onPressed: _testSetAnalyticsCollectionEnabled,
+              child: const Text('Test setAnalyticsCollectionEnabled'),
             ),
-            ListTile(
-              title: const Text('Dynamic Links'),
-              onTap: () {
-                Navigator.of(context).pushNamed('/dynamic_links');
-              },
+            MaterialButton(
+              onPressed: _testSetSessionTimeoutDuration,
+              child: const Text('Test setSessionTimeoutDuration'),
             ),
-            ListTile(
-              title: const Text('Remote Config'),
-              onTap: () {
-                Navigator.of(context).pushNamed('/remote_config');
-              },
+            MaterialButton(
+              onPressed: _testSetUserProperty,
+              child: const Text('Test setUserProperty'),
             ),
-            ListTile(
-              title: const Text('In-App Messaging'),
-              onTap: () {
-                Navigator.of(context).pushNamed('/in_app_messaging');
-              },
+            MaterialButton(
+              onPressed: _testAppInstanceId,
+              child: const Text('Test appInstanceId'),
             ),
-            ListTile(
-              title: const Text('AdMob'),
-              onTap: () {
-                Navigator.of(context).pushNamed('/admob');
-              },
+            MaterialButton(
+              onPressed: _testResetAnalyticsData,
+              child: const Text('Test resetAnalyticsData'),
             ),
-            ListTile(
-              title: const Text('ML Kit'),
-              onTap: () {
-                Navigator.of(context).pushNamed('/mlkit');
-              },
+            MaterialButton(
+              onPressed: _setDefaultEventParameters,
+              child: const Text('Test setDefaultEventParameters'),
             ),
-            ListTile(
-              title: const Text('Log Out'),
-              onTap: () async {
-                final navigator = Navigator.of(context);
-                await FirebaseAuth.instance.signOut();
-                navigator.pushNamedAndRemoveUntil(
-                  '/login',
-                  (Route<dynamic> route) => false,
-                );
-              },
+            Text(
+              _message,
+              style: const TextStyle(color: Color.fromARGB(255, 0, 155, 0)),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute<TabsPage>(
-              settings: const RouteSettings(name: TabsPage.routeName),
-              builder: (BuildContext context) {
-                return TabsPage(widget.observer);
-              },
-            ),
-          );
-        },
-        child: const Icon(Icons.tab),
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 0, 155, 0),
+                ),
+                child: Text(
+                  'Firebase Analytics',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+              ListTile(
+                title: const Text('Todos'),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/todos');
+                },
+              ),
+              ListTile(
+                title: const Text('Performance'),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/performance');
+                },
+              ),
+              ListTile(
+                title: const Text('Cloud Messaging'),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/messaging');
+                },
+              ),
+              ListTile(
+                title: const Text('Authentication'),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/authentication');
+                },
+              ),
+              ListTile(
+                title: const Text('Dynamic Links'),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/dynamic_links');
+                },
+              ),
+              ListTile(
+                title: const Text('Remote Config'),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/remote_config');
+                },
+              ),
+              ListTile(
+                title: const Text('In-App Messaging'),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/in_app_messaging');
+                },
+              ),
+              ListTile(
+                title: const Text('AdMob'),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/admob');
+                },
+              ),
+              ListTile(
+                title: const Text('ML Kit'),
+                onTap: () {
+                  Navigator.of(context).pushNamed('/mlkit');
+                },
+              ),
+              ListTile(
+                title: const Text('Log Out'),
+                onTap: () async {
+                  final navigator = Navigator.of(context);
+                  await FirebaseAuth.instance.signOut();
+                  navigator.pushNamedAndRemoveUntil(
+                    '/login',
+                    (Route<dynamic> route) => false,
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<TabsPage>(
+                settings: const RouteSettings(name: TabsPage.routeName),
+                builder: (BuildContext context) {
+                  return TabsPage(widget.observer);
+                },
+              ),
+            );
+          },
+          child: const Icon(Icons.tab),
+        ),
       ),
     );
   }

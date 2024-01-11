@@ -15,9 +15,10 @@ class TodoDayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<TimePlannerTask> tasks = todos.map((todo) {
+      final diffInDays = selectedDate.difference(todo.dueDate!).inDays;
       return TimePlannerTask(
         dateTime: TimePlannerDateTime(
-          day: 0,
+          day: diffInDays,
           hour: todo.dueDate!.hour,
           minutes: todo.dueDate!.minute,
         ),
@@ -38,6 +39,17 @@ class TodoDayWidget extends StatelessWidget {
       headers: const [
         TimePlannerTitle(title: 'Today'),
       ],
+      style: TimePlannerStyle(
+        backgroundColor: Colors.white,
+        // default value for height is 80
+        cellHeight: 80,
+        // default value for width is 90
+        cellWidth: 180,
+        dividerColor: Colors.white,
+        showScrollBar: true,
+        horizontalTaskPadding: 5,
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+      ),
     );
   }
 }

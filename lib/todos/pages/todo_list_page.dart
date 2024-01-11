@@ -81,11 +81,7 @@ class TodoListPage extends StatelessWidget {
         bloc.add(SelectDay(selectedDay));
         Navigator.of(context).pushNamed('/select_day', arguments: {
           'selectedDate': selectedDay,
-          'todos': state.todos.where((todo) {
-            return todo.dueDate?.day == selectedDay.day &&
-                todo.dueDate?.month == selectedDay.month &&
-                todo.dueDate?.year == selectedDay.year;
-          }).toList(),
+          'todos': state.todos,
         });
       },
       eventLoader: (day) {
