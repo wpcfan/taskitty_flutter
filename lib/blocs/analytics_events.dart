@@ -32,3 +32,21 @@ class AnalyticsEventLogEvent extends AnalyticsEvent {
   @override
   List<Object> get props => [eventName, eventParameters];
 }
+
+class AnalyticsEventSetUserId extends AnalyticsEvent {
+  AnalyticsEventSetUserId({required this.userId});
+
+  final String userId;
+
+  @override
+  List<Object> get props => [userId];
+}
+
+class AnalyticsEventLogin extends AnalyticsEvent {
+  AnalyticsEventLogin({required this.method});
+
+  final String method;
+
+  @override
+  List<Object> get props => [method];
+}

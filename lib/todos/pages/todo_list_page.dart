@@ -59,9 +59,8 @@ class TodoListPage extends StatelessWidget {
 
   void listenStateChanges(context, state) {
     if (state.error.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(state.error)),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(state.error)));
 
       context.read<TodoBloc>().add(const ClearError());
     }
@@ -143,18 +142,14 @@ class TodoListPage extends StatelessWidget {
           bloc.add(const LoadTodos());
           await bloc.stream.firstWhere((state) => !state.loading);
         },
-        inactiveWidget: Center(
-          child: Text(AppLocalizations.of(context)!.ptrInactive),
-        ),
-        pullToRefreshWidget: Center(
-          child: Text(AppLocalizations.of(context)!.ptrPullToRefresh),
-        ),
-        releaseToRefreshWidget: Center(
-          child: Text(AppLocalizations.of(context)!.ptrReleaseToRefresh),
-        ),
-        refreshCompleteWidget: Center(
-          child: Text(AppLocalizations.of(context)!.ptrRefreshComplete),
-        ),
+        inactiveWidget:
+            Text(AppLocalizations.of(context)!.ptrInactive).center(),
+        pullToRefreshWidget:
+            Text(AppLocalizations.of(context)!.ptrPullToRefresh).center(),
+        releaseToRefreshWidget:
+            Text(AppLocalizations.of(context)!.ptrReleaseToRefresh).center(),
+        refreshCompleteWidget:
+            Text(AppLocalizations.of(context)!.ptrRefreshComplete).center(),
       ),
     );
   }

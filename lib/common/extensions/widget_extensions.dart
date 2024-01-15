@@ -661,4 +661,28 @@ extension WidgetExtension on Widget {
         autovalidateMode: autovalidateMode,
         child: this,
       );
+
+  linearGradient({
+    Key? key,
+    AlignmentGeometry begin = Alignment.centerLeft,
+    AlignmentGeometry end = Alignment.centerRight,
+    List<Color> colors = const <Color>[],
+    List<double> stops = const <double>[],
+    TileMode tileMode = TileMode.clamp,
+    GradientTransform? transform,
+  }) =>
+      DecoratedBox(
+        key: key,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: begin,
+            end: end,
+            colors: colors,
+            stops: stops,
+            tileMode: tileMode,
+            transform: transform,
+          ),
+        ),
+        child: this,
+      );
 }

@@ -158,11 +158,6 @@ class HomePageState extends State<HomePage> {
     setMessage('logEvent succeeded');
   }
 
-  Future<void> _testSetUserId() async {
-    await widget.analytics.setUserId(id: 'some-user');
-    setMessage('setUserId succeeded');
-  }
-
   Future<void> _testSetCurrentScreen() async {
     await widget.analytics.setCurrentScreen(
       screenName: 'Analytics Demo',
@@ -403,10 +398,6 @@ class HomePageState extends State<HomePage> {
             MaterialButton(
               onPressed: _testAllEventTypes,
               child: const Text('Test standard event types'),
-            ),
-            MaterialButton(
-              onPressed: _testSetUserId,
-              child: const Text('Test setUserId'),
             ),
             MaterialButton(
               onPressed: _testSetCurrentScreen,

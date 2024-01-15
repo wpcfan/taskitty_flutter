@@ -112,6 +112,8 @@ class LoginPage extends StatelessWidget {
       onPressed: () {
         formKey.currentState!.save();
         if (formKey.currentState!.validate()) {
+          final analyticsBloc = context.read<AnalyticsBloc>();
+          analyticsBloc.add(AnalyticsEventLogin(method: 'Email'));
           // Get the instance of LoginBloc
           final loginBloc = context.read<LoginBloc>();
           // Add LoginStarted event
@@ -173,6 +175,10 @@ class LoginPage extends StatelessWidget {
         );
     }
     if (state is LoginSuccessState) {
+      final analyticsBloc = context.read<AnalyticsBloc>();
+      analyticsBloc.add(AnalyticsEventSetUserId(
+        userId: state.uid,
+      ));
       Navigator.pushReplacementNamed(context, '/home');
     }
   }
@@ -184,8 +190,10 @@ class LoginPage extends StatelessWidget {
         height: 32,
       ),
       onPressed: () {
+        final analyticsBloc = context.read<AnalyticsBloc>();
+        analyticsBloc.add(AnalyticsEventLogin(method: 'Google'));
         // Get the instance of LoginBloc
-        final loginBloc = BlocProvider.of<LoginBloc>(context);
+        final loginBloc = context.read<LoginBloc>();
         // Add LoginWithGoogleStarted event
         loginBloc.add(LoginWithGoogleStarted());
       },
@@ -199,8 +207,10 @@ class LoginPage extends StatelessWidget {
         height: 32,
       ),
       onPressed: () {
+        final analyticsBloc = context.read<AnalyticsBloc>();
+        analyticsBloc.add(AnalyticsEventLogin(method: 'Apple'));
         // Get the instance of LoginBloc
-        final loginBloc = BlocProvider.of<LoginBloc>(context);
+        final loginBloc = context.read<LoginBloc>();
         // Add LoginWithAppleStarted event
         loginBloc.add(LoginWithAppleStarted());
       },

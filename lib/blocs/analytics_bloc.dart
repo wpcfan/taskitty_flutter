@@ -13,6 +13,8 @@ class AnalyticsBloc extends Bloc<AnalyticsEvent, AnalyticsState> {
     on<AnalyticsEventAppStarted>(_onAppStarted);
     on<AnalyticsEventPageView>(_onPageView);
     on<AnalyticsEventLogEvent>(_onLogEvent);
+    on<AnalyticsEventSetUserId>(_onSetUserId);
+    on<AnalyticsEventLogin>(_onLogin);
   }
 
   Future<void> _onAppStarted(
@@ -43,5 +45,20 @@ class AnalyticsBloc extends Bloc<AnalyticsEvent, AnalyticsState> {
       parameters: event.eventParameters,
     );
     emit(state.copyWith(currentEventName: event.eventName));
+  }
+
+  Future<void> _onSetUserId(
+    AnalyticsEventSetUserId event,
+    Emitter<AnalyticsState> emit,
+  ) async {
+    await analytics.setUserId(id: event.userId);
+    emit(state.copyWith(userId: event.userId));
+  }
+
+  Future<void> _onLogin(
+    AnalyticsEventLogin event,
+    Emitter<AnalyticsState> emit,
+  ) async {
+    await analytics.logLogin(loginMethod: event.method);
   }
 }
