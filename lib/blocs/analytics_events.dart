@@ -50,3 +50,8 @@ class AnalyticsEventLogin extends AnalyticsEvent {
   @override
   List<Object> get props => [method];
 }
+
+class AnalyticsEventLogout extends AnalyticsEvent {
+  @override
+  List<Object> get props => [];
+}

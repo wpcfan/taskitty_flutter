@@ -37,7 +37,19 @@ class LoginPage extends StatelessWidget {
           screenClassOverride: 'LoginPage',
         ));
         return BlocConsumer<LoginBloc, LoginState>(
-          listener: listenStateChange,
+          listener: (context, state) {
+            if (state is LoginFailureState) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(content: Text(state.error)),
+                );
+            }
+            if (state is LoginSuccessState) {
+              analyticsBloc.add(AnalyticsEventSetUserId(userId: state.uid));
+              Navigator.pushReplacementNamed(context, '/home');
+            }
+          },
           builder: buildChild,
         );
       }),
@@ -164,23 +176,6 @@ class LoginPage extends StatelessWidget {
         return null;
       },
     );
-  }
-
-  void listenStateChange(context, state) {
-    if (state is LoginFailureState) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(content: Text(state.error)),
-        );
-    }
-    if (state is LoginSuccessState) {
-      final analyticsBloc = context.read<AnalyticsBloc>();
-      analyticsBloc.add(AnalyticsEventSetUserId(
-        userId: state.uid,
-      ));
-      Navigator.pushReplacementNamed(context, '/home');
-    }
   }
 
   Widget buildLoginWithGoogleButton(BuildContext context) {

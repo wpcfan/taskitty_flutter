@@ -10,10 +10,6 @@ class LoginStarted extends LoginEvent {
 
 class LoginWithGoogleStarted extends LoginEvent {}
 
-class LoginWithFacebookStarted extends LoginEvent {}
-
-class LoginWithMicrosoftStarted extends LoginEvent {}
-
 class LoginWithAppleStarted extends LoginEvent {}
 
 class ForgotPasswordStarted extends LoginEvent {
@@ -21,3 +17,5 @@ class ForgotPasswordStarted extends LoginEvent {
 
   ForgotPasswordStarted({required this.email});
 }
+
+class LoginLogoutStarted extends LoginEvent {}

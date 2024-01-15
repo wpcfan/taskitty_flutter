@@ -17,6 +17,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         (event, emit) => _mapLoginWithAppleEventToState(event, emit));
     on<ForgotPasswordStarted>(
         (event, emit) => _mapForgotPasswordEventToState(event, emit));
+    on<LoginLogoutStarted>((event, emit) async {
+      await auth.signOut();
+      emit(LoginInitial());
+    });
   }
 
   void _mapLoginEventToState(

@@ -15,6 +15,7 @@ class AnalyticsBloc extends Bloc<AnalyticsEvent, AnalyticsState> {
     on<AnalyticsEventLogEvent>(_onLogEvent);
     on<AnalyticsEventSetUserId>(_onSetUserId);
     on<AnalyticsEventLogin>(_onLogin);
+    on<AnalyticsEventLogout>(_onLogout);
   }
 
   Future<void> _onAppStarted(
@@ -60,5 +61,12 @@ class AnalyticsBloc extends Bloc<AnalyticsEvent, AnalyticsState> {
     Emitter<AnalyticsState> emit,
   ) async {
     await analytics.logLogin(loginMethod: event.method);
+  }
+
+  Future<void> _onLogout(
+    AnalyticsEventLogout event,
+    Emitter<AnalyticsState> emit,
+  ) async {
+    await analytics.logEvent(name: 'logout');
   }
 }
