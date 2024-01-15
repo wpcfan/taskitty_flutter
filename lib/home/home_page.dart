@@ -37,12 +37,30 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   String _message = '';
   bool _notificationsEnabled = false;
+  int id = 0;
 
   @override
   void initState() {
     super.initState();
     _isAndroidPermissionGranted();
     _requestPermissions();
+  }
+
+  Future<void> _showNotification() async {
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails('your channel id', 'your channel name',
+            channelDescription: 'your channel description',
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker');
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+    setState(() {
+      id++;
+    });
+    await widget.flutterLocalNotificationsPlugin.show(
+        id, 'plain title', 'plain body', notificationDetails,
+        payload: 'item x');
   }
 
   Future<void> _isAndroidPermissionGranted() async {
@@ -446,9 +464,9 @@ class HomePageState extends State<HomePage> {
                 },
               ),
               ListTile(
-                title: const Text('Performance'),
-                onTap: () {
-                  Navigator.of(context).pushNamed('/performance');
+                title: const Text('Show Notification'),
+                onTap: () async {
+                  await _showNotification();
                 },
               ),
               ListTile(

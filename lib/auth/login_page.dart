@@ -6,25 +6,36 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../common/common.dart';
+import '../blocs/blocs.dart';
 import 'blocs/blocs.dart';
 import 'constants.dart';
 
 class LoginPage extends StatelessWidget {
-  final FirebaseAnalytics analytics;
-  final FirebaseAnalyticsObserver observer;
   final FirebaseAuth auth;
   const LoginPage({
     super.key,
-    required this.analytics,
-    required this.observer,
     required this.auth,
   });
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => LoginBloc(auth: auth),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<LoginBloc>(
+          create: (context) => LoginBloc(auth: auth),
+        ),
+        BlocProvider<AnalyticsBloc>(
+          create: (context) => AnalyticsBloc(
+            analytics: context.read<FirebaseAnalytics>(),
+          ),
+        ),
+      ],
       child: Builder(builder: (context) {
+        final analyticsBloc = context.read<AnalyticsBloc>();
+        analyticsBloc.add(AnalyticsEventPageView(
+          screenName: 'LoginPage',
+          screenClassOverride: 'LoginPage',
+        ));
         return BlocConsumer<LoginBloc, LoginState>(
           listener: listenStateChange,
           builder: buildChild,

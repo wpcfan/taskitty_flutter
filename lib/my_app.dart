@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
         final analytics = context.read<FirebaseAnalytics>();
         final observer = context.read<FirebaseAnalyticsObserver>();
         final deviceCalendarPlugin = context.read<DeviceCalendarPlugin>();
+
         final homePage = HomePage(
           title: 'Firebase Analytics Demo',
           analytics: analytics,
@@ -41,29 +42,16 @@ class MyApp extends StatelessWidget {
           notificationAppLaunchDetails: notificationAppLaunchDetails,
           flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
         );
-        final loginPage = LoginPage(
-          analytics: analytics,
-          observer: observer,
-          auth: auth,
-        );
-        final forgotPage = ForgotPasswordPage(
-          auth: auth,
-        );
-        final registerPage = RegistrationPage(
-          auth: auth,
-        );
+        final loginPage = LoginPage(auth: auth);
+        final forgotPage = ForgotPasswordPage(auth: auth);
+        final registerPage = RegistrationPage(auth: auth);
         final todoPage = TodoListPage(
           firestore: firestore,
           auth: auth,
-          analytics: analytics,
           deviceCalendarPlugin: deviceCalendarPlugin,
         );
-        final addTodoPage = AddTodoPage(
-          analytics: analytics,
-        );
-        final selectDayPage = SelectDayPage(
-          analytics: analytics,
-        );
+        const selectDayPage = SelectDayPage();
+        const addTodoPage = AddTodoPage();
         final routeMap = {
           '/login': (context) => loginPage,
           '/forgot_password': (context) => forgotPage,

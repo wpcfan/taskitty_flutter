@@ -1,20 +1,19 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
+import '../../blocs/blocs.dart';
 import '../../common/common.dart';
 import '../../constants.dart';
 
 class SpeechToTextWidget extends StatefulWidget {
   final Function(String)? onVoiceRecognized;
-  final FirebaseAnalytics analytics;
   const SpeechToTextWidget({
     super.key,
     this.onVoiceRecognized,
-    required this.analytics,
   });
 
   @override
@@ -65,13 +64,14 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
     if (isDevelopment) {
       debugPrint('$eventTime $eventDescription');
     }
-    await widget.analytics.logEvent(
-      name: 'speech_to_text',
-      parameters: <String, dynamic>{
+    final bloc = context.read<AnalyticsBloc>();
+    bloc.add(AnalyticsEventLogEvent(
+      eventName: 'speech_to_text',
+      eventParameters: <String, dynamic>{
         'event_time': eventTime,
         'event_description': eventDescription,
       },
-    );
+    ));
   }
 
   /// Each time to start a speech recognition session

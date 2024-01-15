@@ -1,17 +1,16 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:taskitty_flutter/todos/todos.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../blocs/blocs.dart';
 import '../../common/common.dart';
 
 class AddTodoPage extends StatefulWidget {
-  final FirebaseAnalytics analytics;
-
   const AddTodoPage({
     super.key,
-    required this.analytics,
   });
 
   @override
@@ -28,10 +27,6 @@ class _AddTodoPageState extends State<AddTodoPage> {
     super.initState();
     _textEditingController = TextEditingController();
     _tags = [];
-    widget.analytics.setCurrentScreen(
-      screenName: 'AddTodoPage',
-      screenClassOverride: 'AddTodoPage',
-    );
   }
 
   @override
@@ -41,9 +36,21 @@ class _AddTodoPageState extends State<AddTodoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: buildAppBar(context),
-      body: buildScaffoldBody(context),
+    return BlocProvider(
+      create: (context) => AnalyticsBloc(
+        analytics: context.read<FirebaseAnalytics>(),
+      ),
+      child: Builder(builder: (context) {
+        final analyticsBloc = context.read<AnalyticsBloc>();
+        analyticsBloc.add(AnalyticsEventPageView(
+          screenName: 'AddTodoPage',
+          screenClassOverride: 'AddTodoPage',
+        ));
+        return Scaffold(
+          appBar: buildAppBar(context),
+          body: buildScaffoldBody(context),
+        );
+      }),
     );
   }
 
@@ -116,7 +123,6 @@ class _AddTodoPageState extends State<AddTodoPage> {
 
   Widget buildSpeechToText() {
     return SpeechToTextWidget(
-      analytics: widget.analytics,
       onVoiceRecognized: (text) {
         _textEditingController.text = text;
         debugPrint('Voice recognized: $text');

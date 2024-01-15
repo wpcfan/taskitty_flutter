@@ -8,6 +8,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:taskitty_flutter/common/common.dart';
 
+import '../../blocs/blocs.dart';
 import '../blocs/blocs.dart';
 import '../components/components.dart';
 import '../models/models.dart';
@@ -15,29 +16,37 @@ import '../models/models.dart';
 class TodoListPage extends StatelessWidget {
   final FirebaseFirestore firestore;
   final FirebaseAuth auth;
-  final FirebaseAnalytics analytics;
   final DeviceCalendarPlugin deviceCalendarPlugin;
   const TodoListPage({
     super.key,
     required this.firestore,
     required this.auth,
-    required this.analytics,
     required this.deviceCalendarPlugin,
   });
 
   @override
   Widget build(BuildContext context) {
-    analytics.setCurrentScreen(
-      screenName: 'TodoListPage',
-      screenClassOverride: 'TodoListPage',
-    );
-    return BlocProvider<TodoBloc>(
-      create: (context) => TodoBloc(
-        firestore: firestore,
-        auth: auth,
-        deviceCalendarPlugin: deviceCalendarPlugin,
-      )..add(const LoadTodos()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<TodoBloc>(
+          create: (context) => TodoBloc(
+            firestore: firestore,
+            auth: auth,
+            deviceCalendarPlugin: deviceCalendarPlugin,
+          )..add(const LoadTodos()),
+        ),
+        BlocProvider<AnalyticsBloc>(
+          create: (context) => AnalyticsBloc(
+            analytics: context.read<FirebaseAnalytics>(),
+          ),
+        ),
+      ],
       child: Builder(builder: (context) {
+        final analyticsBloc = context.read<AnalyticsBloc>();
+        analyticsBloc.add(AnalyticsEventPageView(
+          screenName: 'TodoListPage',
+          screenClassOverride: 'TodoListPage',
+        ));
         return BlocConsumer<TodoBloc, TodoState>(
           listener: listenStateChanges,
           buildWhen: (previous, current) =>
