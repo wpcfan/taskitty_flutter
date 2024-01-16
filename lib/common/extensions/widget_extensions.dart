@@ -685,4 +685,28 @@ extension WidgetExtension on Widget {
         ),
         child: this,
       );
+
+  builder({
+    Key? key,
+    Function(BuildContext)? preBuild,
+  }) =>
+      Builder(
+        key: key,
+        builder: (context) {
+          preBuild?.call(context);
+          return this;
+        },
+      );
+
+  animatedBuilder({
+    Key? key,
+    required TransitionBuilder builder,
+    required Listenable animation,
+  }) =>
+      AnimatedBuilder(
+        key: key,
+        animation: animation,
+        builder: builder,
+        child: this,
+      );
 }

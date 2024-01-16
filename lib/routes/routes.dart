@@ -23,10 +23,14 @@ final GoRouter goRouter = GoRouter(routes: [
     path: '/login',
     builder: (context, state) {
       final auth = context.read<FirebaseAuth>();
+      final analytics = context.read<FirebaseAnalytics>();
       return MultiBlocProvider(
         providers: [
           BlocProvider<LoginBloc>(
-            create: (context) => LoginBloc(auth: auth),
+            create: (context) => LoginBloc(
+              auth: auth,
+              analytics: analytics,
+            ),
           ),
           BlocProvider<AnalyticsBloc>(
             create: (context) => AnalyticsBloc(
@@ -34,7 +38,15 @@ final GoRouter goRouter = GoRouter(routes: [
             ),
           ),
         ],
-        child: LoginPage(auth: auth),
+        child: const LoginPage().builder(
+          preBuild: (context) {
+            final analyticsBloc = context.read<AnalyticsBloc>();
+            analyticsBloc.add(AnalyticsEventPageView(
+              screenName: 'LoginPage',
+              screenClassOverride: 'LoginPage',
+            ));
+          },
+        ),
       );
     },
   ),
@@ -42,10 +54,14 @@ final GoRouter goRouter = GoRouter(routes: [
     path: '/forgot_password',
     builder: (context, state) {
       final auth = context.read<FirebaseAuth>();
+      final analytics = context.read<FirebaseAnalytics>();
       return MultiBlocProvider(
         providers: [
           BlocProvider<LoginBloc>(
-            create: (context) => LoginBloc(auth: auth),
+            create: (context) => LoginBloc(
+              auth: auth,
+              analytics: analytics,
+            ),
           ),
           BlocProvider<AnalyticsBloc>(
             create: (context) => AnalyticsBloc(
@@ -53,7 +69,15 @@ final GoRouter goRouter = GoRouter(routes: [
             ),
           ),
         ],
-        child: ForgotPasswordPage(auth: auth),
+        child: const ForgotPasswordPage().builder(
+          preBuild: (context) {
+            final analyticsBloc = context.read<AnalyticsBloc>();
+            analyticsBloc.add(AnalyticsEventPageView(
+              screenName: 'ForgotPasswordPage',
+              screenClassOverride: 'ForgotPasswordPage',
+            ));
+          },
+        ),
       );
     },
   ),
@@ -61,10 +85,14 @@ final GoRouter goRouter = GoRouter(routes: [
     path: '/register',
     builder: (context, state) {
       final auth = context.read<FirebaseAuth>();
+      final analytics = context.read<FirebaseAnalytics>();
       return MultiBlocProvider(
         providers: [
           BlocProvider<RegisterBloc>(
-            create: (context) => RegisterBloc(auth: auth),
+            create: (context) => RegisterBloc(
+              auth: auth,
+              analytics: analytics,
+            ),
           ),
           BlocProvider<AnalyticsBloc>(
             create: (context) => AnalyticsBloc(
@@ -72,7 +100,15 @@ final GoRouter goRouter = GoRouter(routes: [
             ),
           ),
         ],
-        child: RegistrationPage(auth: auth),
+        child: const RegistrationPage().builder(
+          preBuild: (context) {
+            final analyticsBloc = context.read<AnalyticsBloc>();
+            analyticsBloc.add(AnalyticsEventPageView(
+              screenName: 'RegistrationPage',
+              screenClassOverride: 'RegistrationPage',
+            ));
+          },
+        ),
       );
     },
   ),
@@ -107,11 +143,13 @@ final GoRouter goRouter = GoRouter(routes: [
                 )..add(const LoadTodos()),
               ),
             ],
-            child: TodoListPage(
-              auth: auth,
-              firestore: firestore,
-              deviceCalendarPlugin: deviceCalendarPlugin,
-            ),
+            child: const TodoListPage().builder(preBuild: (context) {
+              final analyticsBloc = context.read<AnalyticsBloc>();
+              analyticsBloc.add(AnalyticsEventPageView(
+                screenName: 'TodoListPage',
+                screenClassOverride: 'TodoListPage',
+              ));
+            }),
           );
         },
       ),
@@ -124,7 +162,7 @@ final GoRouter goRouter = GoRouter(routes: [
           return SelectDayPage(
             selectedDate: selectedDate,
             todos: todos,
-          );
+          ).builder();
         },
       ),
       GoRoute(
@@ -132,7 +170,7 @@ final GoRouter goRouter = GoRouter(routes: [
         builder: (context, state) {
           final topTags =
               state.uri.queryParameters['top_tags']?.split(',') ?? [];
-          return AddTodoPage(topTags: topTags);
+          return AddTodoPage(topTags: topTags).builder();
         },
       ),
     ],

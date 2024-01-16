@@ -1,46 +1,32 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../common/common.dart';
-import '../blocs/blocs.dart';
 import 'blocs/blocs.dart';
 import 'constants.dart';
 
 class LoginPage extends StatelessWidget {
-  final FirebaseAuth auth;
-  const LoginPage({
-    super.key,
-    required this.auth,
-  });
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      final analyticsBloc = context.read<AnalyticsBloc>();
-      analyticsBloc.add(AnalyticsEventPageView(
-        screenName: 'LoginPage',
-        screenClassOverride: 'LoginPage',
-      ));
-      return BlocConsumer<LoginBloc, LoginState>(
-        listener: (context, state) {
-          if (state is LoginFailureState) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(content: Text(state.error)),
-              );
-          }
-          if (state is LoginSuccessState) {
-            analyticsBloc.add(AnalyticsEventSetUserId(userId: state.uid));
-            Navigator.pushReplacementNamed(context, '/home');
-          }
-        },
-        builder: buildChild,
-      );
-    });
+    return BlocConsumer<LoginBloc, LoginState>(
+      listener: (context, state) {
+        if (state is LoginFailureState) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(content: Text(state.error)),
+            );
+        }
+        if (state is LoginSuccessState) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      },
+      builder: buildChild,
+    );
   }
 
   Widget buildChild(context, state) {
@@ -111,8 +97,6 @@ class LoginPage extends StatelessWidget {
       onPressed: () {
         formKey.currentState!.save();
         if (formKey.currentState!.validate()) {
-          final analyticsBloc = context.read<AnalyticsBloc>();
-          analyticsBloc.add(AnalyticsEventLogin(method: 'Email'));
           // Get the instance of LoginBloc
           final loginBloc = context.read<LoginBloc>();
           // Add LoginStarted event
@@ -172,8 +156,6 @@ class LoginPage extends StatelessWidget {
         height: 32,
       ),
       onPressed: () {
-        final analyticsBloc = context.read<AnalyticsBloc>();
-        analyticsBloc.add(AnalyticsEventLogin(method: 'Google'));
         // Get the instance of LoginBloc
         final loginBloc = context.read<LoginBloc>();
         // Add LoginWithGoogleStarted event
@@ -189,8 +171,6 @@ class LoginPage extends StatelessWidget {
         height: 32,
       ),
       onPressed: () {
-        final analyticsBloc = context.read<AnalyticsBloc>();
-        analyticsBloc.add(AnalyticsEventLogin(method: 'Apple'));
         // Get the instance of LoginBloc
         final loginBloc = context.read<LoginBloc>();
         // Add LoginWithAppleStarted event

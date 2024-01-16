@@ -16,20 +16,18 @@ class SelectDayPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      final analyticsBloc = context.read<AnalyticsBloc>();
-      analyticsBloc.add(AnalyticsEventPageView(
-        screenName: 'SelectDayPage',
-        screenClassOverride: 'SelectDayPage',
-      ));
-      return Scaffold(
-          appBar: AppBar(
-            title: const HorizontalTimeWidget(),
-          ),
-          body: TodoDayWidget(
-            todos: todos,
-            selectedDate: selectedDate,
-          ));
-    });
+    final analyticsBloc = context.read<AnalyticsBloc>();
+    analyticsBloc.add(AnalyticsEventPageView(
+      screenName: 'SelectDayPage',
+      screenClassOverride: 'SelectDayPage',
+    ));
+    return Scaffold(
+        appBar: AppBar(
+          title: const HorizontalTimeWidget(),
+        ),
+        body: TodoDayWidget(
+          todos: todos,
+          selectedDate: selectedDate,
+        ));
   }
 }

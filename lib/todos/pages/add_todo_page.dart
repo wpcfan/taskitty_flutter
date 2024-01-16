@@ -37,17 +37,15 @@ class _AddTodoPageState extends State<AddTodoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      final analyticsBloc = context.read<AnalyticsBloc>();
-      analyticsBloc.add(AnalyticsEventPageView(
-        screenName: 'AddTodoPage',
-        screenClassOverride: 'AddTodoPage',
-      ));
-      return Scaffold(
-        appBar: buildAppBar(context),
-        body: buildScaffoldBody(context),
-      );
-    });
+    final analyticsBloc = context.read<AnalyticsBloc>();
+    analyticsBloc.add(AnalyticsEventPageView(
+      screenName: 'AddTodoPage',
+      screenClassOverride: 'AddTodoPage',
+    ));
+    return Scaffold(
+      appBar: buildAppBar(context),
+      body: buildScaffoldBody(context),
+    );
   }
 
   Widget buildScaffoldBody(BuildContext context) {

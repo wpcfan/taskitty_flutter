@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,8 +9,12 @@ import 'login_states.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final FirebaseAuth auth;
+  final FirebaseAnalytics analytics;
 
-  LoginBloc({required this.auth}) : super(LoginInitial()) {
+  LoginBloc({
+    required this.auth,
+    required this.analytics,
+  }) : super(LoginInitial()) {
     on<LoginStarted>((event, emit) => _mapLoginEventToState(event, emit));
     on<LoginWithGoogleStarted>(
         (event, emit) => _mapLoginWithGoogleEventToState(event, emit));
@@ -32,6 +37,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         email: event.email,
         password: event.password,
       );
+      analytics.logLogin(loginMethod: 'email');
+      analytics.setUserId(id: result.user!.uid);
       emit(LoginSuccessState(uid: result.user!.uid));
     } on FirebaseAuthException catch (e) {
       emit(LoginFailureState(error: e.message!));
@@ -58,6 +65,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         idToken: googleAuth?.idToken,
       );
       final result = await auth.signInWithCredential(credential);
+      analytics.logLogin(loginMethod: 'google');
+      analytics.setUserId(id: result.user!.uid);
       emit(LoginSuccessState(uid: result.user!.uid));
     } on FirebaseAuthException catch (e) {
       emit(LoginFailureState(error: e.message!));
@@ -74,9 +83,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final appleProvider = AppleAuthProvider();
       if (kIsWeb) {
         final result = await auth.signInWithPopup(appleProvider);
+        analytics.logLogin(loginMethod: 'apple');
+        analytics.setUserId(id: result.user!.uid);
         emit(LoginSuccessState(uid: result.user!.uid));
       } else {
         final result = await auth.signInWithProvider(appleProvider);
+        analytics.logLogin(loginMethod: 'apple');
+        analytics.setUserId(id: result.user!.uid);
         emit(LoginSuccessState(uid: result.user!.uid));
       }
     } on FirebaseAuthException catch (e) {

@@ -1,33 +1,20 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../common/common.dart';
-import '../blocs/blocs.dart';
 import 'blocs/blocs.dart';
 import 'constants.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
-  final FirebaseAuth auth;
-  const ForgotPasswordPage({
-    super.key,
-    required this.auth,
-  });
+  const ForgotPasswordPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      final analyticsBloc = context.read<AnalyticsBloc>();
-      analyticsBloc.add(AnalyticsEventPageView(
-        screenName: 'ForgotPasswordPage',
-        screenClassOverride: 'ForgotPasswordPage',
-      ));
-      return BlocConsumer<LoginBloc, LoginState>(
-        listener: listenStateChange,
-        builder: buildChild,
-      );
-    });
+    return BlocConsumer<LoginBloc, LoginState>(
+      listener: listenStateChange,
+      builder: buildChild,
+    );
   }
 
   Widget buildChild(context, state) {

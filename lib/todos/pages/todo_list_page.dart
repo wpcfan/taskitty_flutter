@@ -1,44 +1,25 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_calendar/device_calendar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../blocs/blocs.dart';
 import '../../common/common.dart';
 import '../blocs/blocs.dart';
 import '../components/components.dart';
 import '../models/models.dart';
 
 class TodoListPage extends StatelessWidget {
-  final FirebaseFirestore firestore;
-  final FirebaseAuth auth;
-  final DeviceCalendarPlugin deviceCalendarPlugin;
-  const TodoListPage({
-    super.key,
-    required this.firestore,
-    required this.auth,
-    required this.deviceCalendarPlugin,
-  });
+  const TodoListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      final analyticsBloc = context.read<AnalyticsBloc>();
-      analyticsBloc.add(AnalyticsEventPageView(
-        screenName: 'TodoListPage',
-        screenClassOverride: 'TodoListPage',
-      ));
-      return BlocConsumer<TodoBloc, TodoState>(
-        listener: listenStateChanges,
-        buildWhen: (previous, current) =>
-            previous != current && current.error.isEmpty,
-        builder: (context, state) => _buildBody(context, state),
-      );
-    });
+    return BlocConsumer<TodoBloc, TodoState>(
+      listener: listenStateChanges,
+      buildWhen: (previous, current) =>
+          previous != current && current.error.isEmpty,
+      builder: (context, state) => _buildBody(context, state),
+    );
   }
 
   void listenStateChanges(context, state) {
