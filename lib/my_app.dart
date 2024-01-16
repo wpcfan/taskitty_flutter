@@ -11,9 +11,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:nested/nested.dart';
 import 'package:relative_time/relative_time.dart';
 
-import 'auth/auth.dart';
-import 'home/home.dart';
-import 'todos/todos.dart';
+import 'routes/routes.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({
@@ -29,39 +27,7 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: buildProviders,
       child: Builder(builder: (context) {
-        final auth = context.read<FirebaseAuth>();
-        final firestore = context.read<FirebaseFirestore>();
-        final analytics = context.read<FirebaseAnalytics>();
-        final observer = context.read<FirebaseAnalyticsObserver>();
-        final deviceCalendarPlugin = context.read<DeviceCalendarPlugin>();
-
-        final homePage = HomePage(
-          title: 'Firebase Analytics Demo',
-          analytics: analytics,
-          observer: observer,
-          notificationAppLaunchDetails: notificationAppLaunchDetails,
-          flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
-        );
-        final loginPage = LoginPage(auth: auth);
-        final forgotPage = ForgotPasswordPage(auth: auth);
-        final registerPage = RegistrationPage(auth: auth);
-        final todoPage = TodoListPage(
-          firestore: firestore,
-          auth: auth,
-          deviceCalendarPlugin: deviceCalendarPlugin,
-        );
-        const selectDayPage = SelectDayPage();
-        const addTodoPage = AddTodoPage();
-        final routeMap = {
-          '/login': (context) => loginPage,
-          '/forgot_password': (context) => forgotPage,
-          '/register': (context) => registerPage,
-          '/home': (context) => homePage,
-          '/todos': (context) => todoPage,
-          '/add_todo': (context) => addTodoPage,
-          '/select_day': (context) => selectDayPage,
-        };
-        return MaterialApp(
+        return MaterialApp.router(
           onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
           localizationsDelegates: const [
             AppLocalizations.delegate, // Add this line
@@ -74,14 +40,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          navigatorObservers: <NavigatorObserver>[observer],
-          routes: routeMap,
-          home: StreamBuilder<User?>(
-            stream: auth.authStateChanges(),
-            builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
-              return snapshot.hasData ? homePage : loginPage;
-            },
-          ),
+          routerConfig: goRouter,
           builder: (context, child) {
             EasyLoading.init();
             return FlutterEasyLoading(child: child);

@@ -418,6 +418,25 @@ class HomePageState extends State<HomePage> {
                 ),
               ],
             ),
+            bottomNavigationBar: BottomNavigationBar(
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                  label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.business),
+                  label: 'Business',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.school),
+                  label: 'School',
+                ),
+              ],
+              currentIndex: 0,
+              selectedItemColor: Colors.amber[800],
+              onTap: (index) {},
+            ),
             drawer: Drawer(
               child: ListView(
                 children: <Widget>[

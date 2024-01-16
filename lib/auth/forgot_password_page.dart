@@ -1,4 +1,3 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,29 +17,17 @@ class ForgotPasswordPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<LoginBloc>(
-          create: (context) => LoginBloc(auth: auth),
-        ),
-        BlocProvider<AnalyticsBloc>(
-          create: (context) => AnalyticsBloc(
-            analytics: context.read<FirebaseAnalytics>(),
-          ),
-        ),
-      ],
-      child: Builder(builder: (context) {
-        final analyticsBloc = context.read<AnalyticsBloc>();
-        analyticsBloc.add(AnalyticsEventPageView(
-          screenName: 'ForgotPasswordPage',
-          screenClassOverride: 'ForgotPasswordPage',
-        ));
-        return BlocConsumer<LoginBloc, LoginState>(
-          listener: listenStateChange,
-          builder: buildChild,
-        );
-      }),
-    );
+    return Builder(builder: (context) {
+      final analyticsBloc = context.read<AnalyticsBloc>();
+      analyticsBloc.add(AnalyticsEventPageView(
+        screenName: 'ForgotPasswordPage',
+        screenClassOverride: 'ForgotPasswordPage',
+      ));
+      return BlocConsumer<LoginBloc, LoginState>(
+        listener: listenStateChange,
+        builder: buildChild,
+      );
+    });
   }
 
   Widget buildChild(context, state) {

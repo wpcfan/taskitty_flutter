@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_calendar/device_calendar.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:taskitty_flutter/common/common.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../blocs/blocs.dart';
+import '../../common/common.dart';
 import '../blocs/blocs.dart';
 import '../components/components.dart';
 import '../models/models.dart';
@@ -26,35 +26,19 @@ class TodoListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<TodoBloc>(
-          create: (context) => TodoBloc(
-            firestore: firestore,
-            auth: auth,
-            deviceCalendarPlugin: deviceCalendarPlugin,
-          )..add(const LoadTodos()),
-        ),
-        BlocProvider<AnalyticsBloc>(
-          create: (context) => AnalyticsBloc(
-            analytics: context.read<FirebaseAnalytics>(),
-          ),
-        ),
-      ],
-      child: Builder(builder: (context) {
-        final analyticsBloc = context.read<AnalyticsBloc>();
-        analyticsBloc.add(AnalyticsEventPageView(
-          screenName: 'TodoListPage',
-          screenClassOverride: 'TodoListPage',
-        ));
-        return BlocConsumer<TodoBloc, TodoState>(
-          listener: listenStateChanges,
-          buildWhen: (previous, current) =>
-              previous != current && current.error.isEmpty,
-          builder: (context, state) => _buildBody(context, state),
-        );
-      }),
-    );
+    return Builder(builder: (context) {
+      final analyticsBloc = context.read<AnalyticsBloc>();
+      analyticsBloc.add(AnalyticsEventPageView(
+        screenName: 'TodoListPage',
+        screenClassOverride: 'TodoListPage',
+      ));
+      return BlocConsumer<TodoBloc, TodoState>(
+        listener: listenStateChanges,
+        buildWhen: (previous, current) =>
+            previous != current && current.error.isEmpty,
+        builder: (context, state) => _buildBody(context, state),
+      );
+    });
   }
 
   void listenStateChanges(context, state) {
@@ -87,10 +71,13 @@ class TodoListPage extends StatelessWidget {
     final calendar = TableCalendarWidget(
       onDaySelected: (selectedDay) {
         bloc.add(SelectDay(selectedDay));
-        Navigator.of(context).pushNamed('/select_day', arguments: {
-          'selectedDate': selectedDay,
-          'todos': state.todos,
-        });
+        final uri = Uri(
+          path: '/select_day',
+          queryParameters: {
+            'selected_date': selectedDay.format(),
+          },
+        );
+        context.push(uri.toString(), extra: state.todos);
       },
       eventLoader: (day) {
         final todos = state.todos.where((todo) {
@@ -120,37 +107,39 @@ class TodoListPage extends StatelessWidget {
             ),
           )
         : [calendar.toSliver(), todoList].toMultiSliver();
-    return Scaffold(
-      body: MyCustomScrollView(
+    return MyCustomScrollView(
+      decoration: decoration,
+      sliverAppBar: MySliverAppBar(
         decoration: decoration,
-        sliverAppBar: MySliverAppBar(
-          decoration: decoration,
-          onRightIconTap: () async {
-            final topTags = state.topTags;
-            final todo = await Navigator.of(context)
-                .pushNamed('/add_todo', arguments: topTags);
-            if (todo != null) {
-              bloc.add(AddTodo(todo as Todo));
-            }
-          },
-          onChanged: (value) {
-            bloc.add(SearchTodos(value));
-          },
-        ),
-        sliver: sliver,
-        onRefresh: () async {
-          bloc.add(const LoadTodos());
-          await bloc.stream.firstWhere((state) => !state.loading);
+        onRightIconTap: () async {
+          final topTags = state.topTags;
+          final uri = Uri(
+            path: '/add_todo',
+            queryParameters: {
+              'top_tags': topTags.join(','),
+            },
+          );
+          final todo = await context.push(uri.toString());
+          if (todo != null) {
+            bloc.add(AddTodo(todo as Todo));
+          }
         },
-        inactiveWidget:
-            Text(AppLocalizations.of(context)!.ptrInactive).center(),
-        pullToRefreshWidget:
-            Text(AppLocalizations.of(context)!.ptrPullToRefresh).center(),
-        releaseToRefreshWidget:
-            Text(AppLocalizations.of(context)!.ptrReleaseToRefresh).center(),
-        refreshCompleteWidget:
-            Text(AppLocalizations.of(context)!.ptrRefreshComplete).center(),
+        onChanged: (value) {
+          bloc.add(SearchTodos(value));
+        },
       ),
+      sliver: sliver,
+      onRefresh: () async {
+        bloc.add(const LoadTodos());
+        await bloc.stream.firstWhere((state) => !state.loading);
+      },
+      inactiveWidget: Text(AppLocalizations.of(context)!.ptrInactive).center(),
+      pullToRefreshWidget:
+          Text(AppLocalizations.of(context)!.ptrPullToRefresh).center(),
+      releaseToRefreshWidget:
+          Text(AppLocalizations.of(context)!.ptrReleaseToRefresh).center(),
+      refreshCompleteWidget:
+          Text(AppLocalizations.of(context)!.ptrRefreshComplete).center(),
     );
   }
 }

@@ -1,4 +1,3 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -9,8 +8,10 @@ import '../../blocs/blocs.dart';
 import '../../common/common.dart';
 
 class AddTodoPage extends StatefulWidget {
+  final List<String> topTags;
   const AddTodoPage({
     super.key,
+    this.topTags = const [],
   });
 
   @override
@@ -36,30 +37,24 @@ class _AddTodoPageState extends State<AddTodoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AnalyticsBloc(
-        analytics: context.read<FirebaseAnalytics>(),
-      ),
-      child: Builder(builder: (context) {
-        final analyticsBloc = context.read<AnalyticsBloc>();
-        analyticsBloc.add(AnalyticsEventPageView(
-          screenName: 'AddTodoPage',
-          screenClassOverride: 'AddTodoPage',
-        ));
-        return Scaffold(
-          appBar: buildAppBar(context),
-          body: buildScaffoldBody(context),
-        );
-      }),
-    );
+    return Builder(builder: (context) {
+      final analyticsBloc = context.read<AnalyticsBloc>();
+      analyticsBloc.add(AnalyticsEventPageView(
+        screenName: 'AddTodoPage',
+        screenClassOverride: 'AddTodoPage',
+      ));
+      return Scaffold(
+        appBar: buildAppBar(context),
+        body: buildScaffoldBody(context),
+      );
+    });
   }
 
   Widget buildScaffoldBody(BuildContext context) {
-    final topTags = ModalRoute.of(context)?.settings.arguments as List<String>?;
     return [
       buildInput(context).expanded(),
       buildSpeechToText().expanded(),
-      buildTags(topTags ?? []).expanded(),
+      buildTags(widget.topTags).expanded(),
       buildDueDate().expanded(),
       buildConfirm(context),
     ]

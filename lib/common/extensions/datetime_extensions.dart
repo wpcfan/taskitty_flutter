@@ -11,4 +11,8 @@ extension DateTimeExtensions on DateTime {
   String get formatted {
     return DateFormat.yMMMEd(Platform.localeName).format(this);
   }
+
+  String format({String pattern = 'yyyy-MM-dd'}) {
+    return DateFormat(pattern, Platform.localeName).format(this);
+  }
 }
