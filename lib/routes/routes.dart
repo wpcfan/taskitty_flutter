@@ -156,9 +156,10 @@ final GoRouter goRouter = GoRouter(routes: [
       GoRoute(
         path: '/select_day',
         builder: (context, state) {
+          final queryParam = state.uri.queryParameters['selected_date'];
           final selectedDate =
-              DateTime.parse(state.uri.queryParameters['selected_date']!);
-          final todos = state.extra! as List<Todo>;
+              queryParam == null ? DateTime.now() : DateTime.parse(queryParam);
+          final todos = state.extra as List<Todo>? ?? [];
           return SelectDayPage(
             selectedDate: selectedDate,
             todos: todos,

@@ -12,12 +12,18 @@ class MySliverAppBar extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.rightIconData = Icons.add,
+    this.snap = true,
+    this.floating = true,
+    this.pinned = true,
   });
   final BoxDecoration decoration;
   final void Function()? onRightIconTap;
   final void Function(String)? onChanged;
   final void Function(String)? onSubmitted;
   final IconData rightIconData;
+  final bool snap;
+  final bool floating;
+  final bool pinned;
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +34,13 @@ class MySliverAppBar extends StatelessWidget {
 
     return SliverAppBar(
       /// 是否随着滑动隐藏标题
-      floating: true,
+      floating: floating,
 
       /// 是否在滑动到顶部的时候显示标题
-      snap: false,
+      snap: snap,
 
       /// 是否固定在顶部
-      pinned: false,
+      pinned: pinned,
 
       /// 状态栏的样式，这里使用的是白色
       systemOverlayStyle: SystemUiOverlayStyle.light,

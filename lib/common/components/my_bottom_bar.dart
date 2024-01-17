@@ -25,13 +25,13 @@ class MyBottomBar extends StatelessWidget {
         final goRouter = GoRouter.of(context);
         switch (index) {
           case 0:
-            goRouter.push('/todos');
+            goRouter.replace('/todos');
             break;
           case 1:
-            goRouter.push('/select_day');
+            goRouter.replace('/select_day');
             break;
           case 2:
-            goRouter.push('/add_todo');
+            goRouter.replace('/add_todo');
             break;
         }
       },
