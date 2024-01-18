@@ -38,5 +38,5 @@
 -keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
 -keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken
 
-// You can specify any path and filename.
+# You can specify any path and filename.
 -printconfiguration ~/tmp/full-r8-config.txt
